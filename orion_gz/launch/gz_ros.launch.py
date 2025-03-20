@@ -1,4 +1,5 @@
 import os
+import yaml
 
 from ament_index_python.packages import get_package_share_directory
 
@@ -8,13 +9,15 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
+from nav2_common.launch import ReplaceString   
+
+
 def generate_launch_description():
     # ------------------------ Paths definitions ----------------------------
-    pkg_description = get_package_share_directory('orion_description')
-    pkg_gz = get_package_share_directory('ros_gz_sim')
-    rsp_file = os.path.join(pkg_description, 'launch', 'rsp.launch.py')
-    gz_file = os.path.join(pkg_gz, 'launch', 'gz_sim.launch.py')
-
+    pkg_gz = get_package_share_directory('orion_gz')
+    spawn_file = os.path.join(pkg_gz, 'launch', 'spawn_robot.launch.py')
+    bridge_config_file_path = os.path.join(pkg_gz, 'config', 
+        'ros_gz_bridge.yaml')
 
     # --------------------------- Configurations -----------------------------
     camera = LaunchConfiguration('camera')
@@ -96,37 +99,29 @@ def generate_launch_description():
         description='Initial Yaw'
     )
 
+    # ------------------------ Additional setups -------------------------------
+    bridge_config = ReplaceString(
+       source_file=bridge_config_file_path,
+       replacements={'<entity>': 'orion'},
+   )
+
+
     # -------------------------- Includes --------------------------------------
-    rsp_include = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(rsp_file),
+    spawn_include = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(spawn_file),
         launch_arguments= {"camera": camera, "servo": servo,
                             "g_mov": g_mov, "rasp": rasp,
-                            "gazebo": 'true'}.items(),
+                            "x": x, "y": y, "z": z,
+                            "roll": roll, "pitch": pitch, 
+                            "yaw": yaw}.items(),
     )
-
-    gazebo_include = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(gz_file),
-        launch_arguments={
-            'gz_args': [f'-r -v 4 ', world],
-            'on_exit_shutdown': 'true'
-        }.items()
-    )
-
     # ------------------------ Nodes --------------------------------------------
-    spawn_model_node = Node(
-        package='ros_gz_sim',
-        executable='create',
-        arguments=[
-            '-name', 'orion',
-            '-x', x,
-            '-y', y,
-            '-z', z,
-            '-R', roll,
-            '-P', pitch,
-            '-Y', yaw,
-            '-topic', 'robot_description',
-            '-allow_renaming', 'false',
-        ],
+    bridge_node = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        parameters=[{
+            'config_file': bridge_config
+        }],
         output='screen',
     )
 
@@ -144,7 +139,6 @@ def generate_launch_description():
         roll_arg,
         pitch_arg,
         yaw_arg,
-        rsp_include,
-        gazebo_include,
-        spawn_model_node,
+        spawn_include,
+        bridge_node,
     ])
