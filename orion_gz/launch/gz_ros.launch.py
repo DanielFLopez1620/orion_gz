@@ -39,7 +39,7 @@ ARGS = [
         description='Initial Roll'),
     DeclareLaunchArgument('P', default_value='0.0',
         description='Initial Pitch'),
-    DeclareLaunchArgument('Y', default_value='3.1416',
+    DeclareLaunchArgument('Y', default_value='0.0',
         description='Initial Yaw'),
     DeclareLaunchArgument('entity', default_value='orion',
         description='Entity name or your preferred name for the robot'),
@@ -47,7 +47,22 @@ ARGS = [
         description='Boolean flag to indicate the usage of the ROS-GZ bridge')
 ]
 
-# /////////////////////////// LAUNCH DEFINITION /////////////////////////////////
+# /////////////////////////// FUNCTION DEFINITIONS ////////////////////////////
+def replace_entities(path):
+    config_file = ReplaceString(
+        source_file=path,
+        replacements={
+           '<entity>': LaunchConfiguration('entity'),
+           '<world>': LaunchConfiguration('world')}
+        )
+    return ReplaceString(
+        source_file=config_file,
+        replacements={
+           '.sdf': ''}
+        )
+
+
+# /////////////////////////// LAUNCH DEFINITION ///////////////////////////////
 def generate_launch_description():
     # Generate launch descripiton
     ld = LaunchDescription(ARGS)
@@ -63,30 +78,12 @@ def generate_launch_description():
     os30a_bridge_path = os.path.join(pkg_gz, 'config', 'os30a_bridge.yaml')  
 
     # Additional config set up
-    base_bridge_config = ReplaceString(
-       source_file=base_bridge_path,
-       replacements={'<entity>': LaunchConfiguration('entity')},
-    )
-    servo_bridge_config = ReplaceString(
-       source_file=servo_bridge_path,
-       replacements={'<entity>': LaunchConfiguration('entity')},
-    )
-    astra_bridge_config = ReplaceString(
-       source_file=astra_bridge_path,
-       replacements={'<entity>': LaunchConfiguration('entity')},
-    )
-    a010_bridge_config = ReplaceString(
-       source_file=a010_bridge_path,
-       replacements={'<entity>': LaunchConfiguration('entity')},
-    )
-    g_mov_bridge_config = ReplaceString(
-       source_file=g_mov_bridge_path,
-       replacements={'<entity>': LaunchConfiguration('entity')},
-    )
-    os30a_bridge_config = ReplaceString(
-       source_file=os30a_bridge_path,
-       replacements={'<entity>': LaunchConfiguration('entity')},
-    )
+    base_bridge_config = replace_entities(base_bridge_path)
+    servo_bridge_config = replace_entities(servo_bridge_path)
+    astra_bridge_config = replace_entities(astra_bridge_path)
+    a010_bridge_config = replace_entities(a010_bridge_path)
+    g_mov_bridge_config = replace_entities(g_mov_bridge_path)
+    os30a_bridge_config = replace_entities(os30a_bridge_path)
 
 
     # Include spawn orion robot

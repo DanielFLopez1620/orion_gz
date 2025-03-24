@@ -1,6 +1,6 @@
 <sdf version="1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="http://sdformat.org/schemas/root.xsd">
-    <world name="empty">
+    <world name="simple_obstacles">
         <!-- /////////////////// GLOBAL CONFIGURATIONS ///////////////////// -->
         <!-- ..................... Physics set up .......................... -->
         <physics name="fast" type="ignored">
@@ -202,7 +202,7 @@
                     <property type="double" key="height">315</property>
                     <property type="double" key="x">1070</property>
                 </gz-gui>
-                <topic>/world/empty/model/orion/link/base_link/sensor/camera/depth_image</topic>
+                <topic>/world/simple_obstacles/model/orion/link/base_link/sensor/camera/depth_image</topic>
                 <topic_picker>true</topic_picker>
             </plugin>
             <plugin filename="ImageDisplay" name="Image Display 3">
@@ -214,7 +214,7 @@
                     <property type="double" key="y">320</property>
                     <property type="double" key="x">1070</property>
                     </gz-gui>
-                <topic>/world/empty/model/orion/link/base_link/sensor/camera/image</topic>
+                <topic>/world/simple_obstacles/model/orion/link/base_link/sensor/camera/image</topic>
                 <topic_picker>true</topic_picker>
             </plugin>
 
@@ -293,6 +293,77 @@
         </model>
 
         <!-- .............. Adding elements to the world ................... -->
-        <!-- Well... this is an empty world, for now, nothing more -->
+        <model name="cube1">
+            <pose>-5 2 1 0 1.57 0</pose>
+            <link name="polyLine2">
+                <inertial>
+                <pose>0.5 0.5 0.75 0 0 0</pose>
+                </inertial>
+                <collision name="collision">
+                <geometry>
+                    <polyline>
+                    <point>0 0</point>
+                    <point>0 1</point>
+                    <point>1 1</point>
+                    <point>1 0 </point>
+                    <height>1.5</height>
+                    </polyline>
+                </geometry>
+                </collision>
+
+                <visual name="polyLineGeom2">
+                <geometry>
+                    <polyline>
+                    <point>0 0</point>
+                    <point>0 1</point>
+                    <point>1 1</point>
+                    <point>1 0 </point>
+                    <height>1.5</height>
+                    </polyline>
+                </geometry>
+                <material>
+                    <ambient>0 1.0 1.0 1</ambient>
+                    <diffuse>0 1.0 1.0 1</diffuse>
+                    <specular>0 1.0 1.0 1</specular>
+                </material>
+                </visual>
+            </link>
+        </model>
+        <model name="cube2">
+            <pose>5 2 1 0 1.57 0</pose>
+            <link name="polyLine2">
+                <inertial>
+                <pose>0.5 0.5 0.75 0 0 0</pose>
+                </inertial>
+                <collision name="collision">
+                <geometry>
+                    <polyline>
+                    <point>0 0</point>
+                    <point>0 1</point>
+                    <point>1 1</point>
+                    <point>1 0 </point>
+                    <height>1.5</height>
+                    </polyline>
+                </geometry>
+                </collision>
+
+                <visual name="polyLineGeom2">
+                <geometry>
+                    <polyline>
+                    <point>0 0</point>
+                    <point>0 1</point>
+                    <point>1 1</point>
+                    <point>1 0 </point>
+                    <height>1.5</height>
+                    </polyline>
+                </geometry>
+                <material>
+                    <ambient>1.0 1.0 0 1</ambient>
+                    <diffuse>1.0 1.0 0 1</diffuse>
+                    <specular>1.0 1.0 0 1</specular>
+                </material>
+                </visual>
+            </link>
+            </model>
     </world>
 </sdf>
