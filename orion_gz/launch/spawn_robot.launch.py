@@ -7,7 +7,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.conditions import IfCondition
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 
@@ -49,10 +49,13 @@ def generate_launch_description():
     ld = LaunchDescription(ARGS)
 
     # Paths definitions
-    pkg_description = get_package_share_directory('orion_description')
+    pkg_orion_description = get_package_share_directory('orion_description')
+    pkg_orion_gz = get_package_share_directory('orion_gz')
     pkg_gz = get_package_share_directory('ros_gz_sim')
-    rsp_file = os.path.join(pkg_description, 'launch', 'rsp.launch.py')
+    rsp_file = os.path.join(pkg_orion_description, 'launch', 'rsp.launch.py')
     gz_file = os.path.join(pkg_gz, 'launch', 'gz_sim.launch.py')
+    world_path = PathJoinSubstitution([pkg_orion_gz,'world', LaunchConfiguration('world')])
+    print(str(pkg_orion_gz))
 
     # Include ORION Robot State Publisher
     ld.add_action(
@@ -73,7 +76,7 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(gz_file),
             launch_arguments={
-                'gz_args': [f'-r -v 4 ', LaunchConfiguration('world')],
+                'gz_args': ['-r -v 4 ', world_path],
                 'on_exit_shutdown': 'true'
             }.items()
         )

@@ -15,6 +15,13 @@
   gz_type_name: "gz.msgs.Pose_V"
   direction: GZ_TO_ROS
 
+# TF
+- ros_topic_name: "tf"
+  gz_topic_name: "/model/<entity>/pose"
+  ros_type_name: "tf2_msgs/msg/TFMessage"
+  gz_type_name: "gz.msgs.Pose_V"
+  direction: GZ_TO_ROS
+
 # Joint State
 - ros_topic_name: "joint_states"
   gz_topic_name: "world/empty/model/<entity>/joint_state"
@@ -31,7 +38,7 @@
 
 # Lidar
 - ros_topic_name: "scan"
-  gz_topic_name: "/world/empty/model/<entity>/link/base_link/sensor/gpu_lidar/scan/points"
+  gz_topic_name: "/world/empty/model/<entity>/link/base_link/sensor/gpu_lidar/scan"
   ros_type_name: "sensor_msgs/msg/LaserScan"
   gz_type_name: "gz.msgs.LaserScan"
   direction: GZ_TO_ROS
