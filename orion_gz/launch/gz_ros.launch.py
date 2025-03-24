@@ -8,7 +8,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.conditions import IfCondition
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
@@ -55,17 +55,41 @@ def generate_launch_description():
     # Path definitions
     pkg_gz = get_package_share_directory('orion_gz')
     spawn_file = os.path.join(pkg_gz, 'launch', 'spawn_robot.launch.py')
-    bridge_config_file_path = os.path.join(pkg_gz, 'config', 
-        'ros_gz_bridge.yaml')   
+    base_bridge_path = os.path.join(pkg_gz, 'config', 'base_bridge.yaml')   
+    servo_bridge_path = os.path.join(pkg_gz, 'config', 'servo_bridge.yaml')  
+    astra_bridge_path = os.path.join(pkg_gz, 'config', 'astra_bridge.yaml')  
+    a010_bridge_path = os.path.join(pkg_gz, 'config', 'a010_bridge.yaml')  
+    g_mov_bridge_path = os.path.join(pkg_gz, 'config', 'g_mov_bridge.yaml')  
+    os30a_bridge_path = os.path.join(pkg_gz, 'config', 'os30a_bridge.yaml')  
 
     # Additional config set up
-    bridge_config = ReplaceString(
-       source_file=bridge_config_file_path,
+    base_bridge_config = ReplaceString(
+       source_file=base_bridge_path,
        replacements={'<entity>': LaunchConfiguration('entity')},
-   )
+    )
+    servo_bridge_config = ReplaceString(
+       source_file=servo_bridge_path,
+       replacements={'<entity>': LaunchConfiguration('entity')},
+    )
+    astra_bridge_config = ReplaceString(
+       source_file=astra_bridge_path,
+       replacements={'<entity>': LaunchConfiguration('entity')},
+    )
+    a010_bridge_config = ReplaceString(
+       source_file=a010_bridge_path,
+       replacements={'<entity>': LaunchConfiguration('entity')},
+    )
+    g_mov_bridge_config = ReplaceString(
+       source_file=g_mov_bridge_path,
+       replacements={'<entity>': LaunchConfiguration('entity')},
+    )
+    os30a_bridge_config = ReplaceString(
+       source_file=os30a_bridge_path,
+       replacements={'<entity>': LaunchConfiguration('entity')},
+    )
 
 
-    # -Include spawn
+    # Include spawn orion robot
     ld.add_action(
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(spawn_file),
@@ -87,17 +111,91 @@ def generate_launch_description():
         )
     )
 
-    # Add additional bridge node
-    ld.add_action( 
-        Node(
-            package='ros_gz_bridge',
-            executable='parameter_bridge',
-            parameters=[{
-                'config_file': bridge_config
-            }],
-            output='screen',
-            condition=IfCondition(LaunchConfiguration('ros_bridge')),
-        )
+    # Launch joint_state, tfs, cmd_vel and odom bridge between ROS and GZ
+    ld.add_action(
+       Node(
+               package='ros_gz_bridge',
+               name="ros_gz_bridge_base",
+               executable='parameter_bridge',
+               parameters=[{
+                'config_file': base_bridge_config
+                }],
+                output='screen',
+                condition=IfCondition(LaunchConfiguration('servo')),
+           ),
+    )
+    
+    # Launch servo controller bridge between ROS and GZ
+    ld.add_action(
+       Node(
+               package='ros_gz_bridge',
+               name="ros_gz_bridge_servo",
+               executable='parameter_bridge',
+               parameters=[{
+                'config_file': servo_bridge_config
+                }],
+                output='screen',
+                condition=IfCondition(LaunchConfiguration('ros_bridge')),
+           ),
+    )
+    
+    # Launch astra_s bridge between ROS and GZ
+    ld.add_action(
+       Node(
+               package='ros_gz_bridge',
+               name="ros_gz_bridge_astra_s",
+               executable='parameter_bridge',
+               parameters=[{
+                'config_file': astra_bridge_config
+                }],
+                output='screen',
+                condition=IfCondition(PythonExpression(
+                    ["'", LaunchConfiguration('camera'), "' == 'astra_s'"])),
+           ),
+    )
+
+    # Launch a010 bridge between ROS and GZ
+    ld.add_action(
+       Node(
+               package='ros_gz_bridge',
+               name="ros_gz_bridge_a010",
+               executable='parameter_bridge',
+               parameters=[{
+                'config_file': a010_bridge_config
+                }],
+                output='screen',
+                condition=IfCondition(PythonExpression(
+                    ["'", LaunchConfiguration('camera'), "' == 'a010'"])),
+           ),
+    )
+
+    # Launch g_mov bridge between ROS and GZ
+    ld.add_action(
+       Node(
+               package='ros_gz_bridge',
+               name="ros_gz_bridge_g_mov",
+               executable='parameter_bridge',
+               parameters=[{
+                'config_file': g_mov_bridge_config
+                }],
+                output='screen',
+                condition=IfCondition(LaunchConfiguration('g_mov')),
+           ),
+    )
+
+    # Launch os30a bridge between ROS and GZ
+    ld.add_action(
+       Node(
+               package='ros_gz_bridge',
+               name="ros_gz_bridge_os30a",
+               executable='parameter_bridge',
+               parameters=[{
+                'config_file': os30a_bridge_config
+                }],
+                output='screen',
+                condition=IfCondition(PythonExpression(
+                    ["'", LaunchConfiguration('camera'), "' == 'os30a'"])),
+           ),
     )
 
     return ld

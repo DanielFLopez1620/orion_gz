@@ -79,14 +79,14 @@ def generate_launch_description():
         )
     )
 
-    # Laucnh clock bridge between ROS and GZ
+    # Launch clock bridge between ROS and GZ
     ld.add_action(
        Node(
                package='ros_gz_bridge',
+               name="ros_gz_bridge_for_clock",
                executable='parameter_bridge',
                arguments=['/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock'],
                output='screen',
-               namespace='andino_gz_sim',
                condition=IfCondition(LaunchConfiguration('ros_bridge')),
            ),
    )

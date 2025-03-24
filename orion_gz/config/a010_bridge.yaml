@@ -1,0 +1,21 @@
+# Placeholders to be rewritten by launch file:
+# - <entity> : Should be replaced by entity name: For example "robot".
+
+# Depth Camera Maixsense A010
+- ros_topic_name: "/camera_a010/depth_image"
+  gz_topic_name: "/world/empty/model/<entity>/link/base_link/sensor/camera/depth_image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/camera_a010/camera_info"
+  gz_topic_name: "/world/empty/model/<entity>/link/base_link/sensor/camera/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "gz.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/camera_a010/points"
+  gz_topic_name: "/world/empty/model/<entity>/link/base_link/sensor/camera/points"
+  ros_type_name: "sensor_msgs/msg/PointCloud2"
+  gz_type_name: "gz.msgs.PointCloudPacked"
+  direction: GZ_TO_ROS
