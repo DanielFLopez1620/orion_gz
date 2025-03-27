@@ -1,19 +1,21 @@
 # ///////////////////////////// REQUIRED LIBRARIES //////////////////////////////
 # .............................. Python libraries ...............................
 import os
-import xacro
 
 # ............................ Launch dependencies .............................
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction
-from launch.actions import RegisterEventHandler
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler, TimerAction
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
+from launch.conditions import IfCondition
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, PythonExpression
 
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+
+# ........................... Additional packages dependencies ..................
+from nav2_common.launch import ReplaceString  
 
 # //////////////////////////// GLOBAL DEFINITIONS //////////////////////////////
 ARGS = [
@@ -25,64 +27,42 @@ ARGS = [
         description="When using camera a010, whether to include or not G Mov"),
     DeclareLaunchArgument('rasp', default_value='rpi5',
         description="Select 4 for Raspberry Pi 4B, or 5 for Raspberry Pi 5"),
-    DeclareLaunchArgument('gazebo',default_value='true',
-        description="True for using gazebo tags, false otherwise"),
+    DeclareLaunchArgument('world', default_value='custom_empty.sdf',
+        description='Specify the world file for Gazebo'),
+    DeclareLaunchArgument('x', default_value='0.0', 
+        description='Initial X position'),
+    DeclareLaunchArgument('y', default_value='0.0',
+        description='Initial Y position'),
+    DeclareLaunchArgument('z', default_value='0.5',
+        description='Initial Z position'),
+    DeclareLaunchArgument('R', default_value='0.0',
+        description='Initial Roll'),
+    DeclareLaunchArgument('P', default_value='0.0',
+        description='Initial Pitch'),
+    DeclareLaunchArgument('Y', default_value='0.0',
+        description='Initial Yaw'),
+    DeclareLaunchArgument('entity', default_value='orion',
+        description='Entity name or your preferred name for the robot'),
 ]
 
-# /////////////////////////// FUNCTIONS DEFINITIONS ////////////////////////////
-def get_argument(context, arg):
-    """
-    Get the context when performing the Launch Configuration
-    """
-    return LaunchConfiguration(arg).perform(context)
+# /////////////////////////// FUNCTION DEFINITIONS ////////////////////////////
+def replace_entities(path):
+    config_file = ReplaceString(
+        source_file=path,
+        replacements={
+           '<entity>': LaunchConfiguration('entity'),
+           '<world>': LaunchConfiguration('world')}
+        )
+    return ReplaceString(
+        source_file=config_file,
+        replacements={
+           '.sdf': ''}
+        )
 
-def generate_robot_description(context):
-    """
-    For generating the robot description, consider the URDF/Xacro file provided,
-    but modifying the meshes source path in order to make it available to
-    Gazebo Harmonic.
-    """
-    # Paths to consider
-    pkg_gmov = get_package_share_directory('g_mov_description')
-    pkg_description = get_package_share_directory('orion_description')
-    xacro_file = os.path.join(pkg_description, 'urdf', 'orion.urdf.xacro')
-
-    # Generating mapping in order to allow xacro modularity
-    mappings = {
-        'camera': get_argument(context, "camera"),
-        'servo': get_argument(context, "servo"),
-        'g_mov': get_argument(context, "g_mov"),
-        'rasp': get_argument(context, "rasp"),
-        'gazebo': get_argument(context, "gazebo")
-    }
-
-    # Obtaining robot description and making the substitution
-    robot_description_config = xacro.process_file(xacro_file, mappings=mappings)
-    robot_desc = robot_description_config.toprettyxml(indent='  ')
-    robot_desc = robot_desc.replace(
-        'package://orion_description/', f'file://{pkg_description}/'
-    )
-    robot_desc = robot_desc.replace(
-        'package://g_mov_description/', f'file://{pkg_gmov}/'
-    )
-
-    # Launch node for robot state publisher
-    rsp_node = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        name="robot_state_publisher",
-        output='screen',
-        parameters=[{
-            'robot_description': robot_desc,
-            'rate': 200,
-        }]
-    )
-
-    # Return configuration as a set
-    return [rsp_node]
 
 # /////////////////////////// LAUNCH DEFINITIONS //////////////////////////////
 def generate_launch_description():
+    
     # Paths to consider
     robot_controllers = PathJoinSubstitution(
         [
@@ -92,17 +72,117 @@ def generate_launch_description():
         ]
     )
 
+    # Path definitions
+    pkg_gz = get_package_share_directory('orion_gz')
+    spawn_file = os.path.join(pkg_gz, 'launch', 'spawn_robot.launch.py')
+    extra_bridge_path = os.path.join(pkg_gz, 'config', 'ros2_ctl_extra_bridge.yaml')   
+    astra_bridge_path = os.path.join(pkg_gz, 'config', 'astra_bridge.yaml')  
+    a010_bridge_path = os.path.join(pkg_gz, 'config', 'a010_bridge.yaml')  
+    g_mov_bridge_path = os.path.join(pkg_gz, 'config', 'g_mov_short_bridge.yaml')  
+    os30a_bridge_path = os.path.join(pkg_gz, 'config', 'os30a_bridge.yaml')  
+
+    # Additional config set up
+    extra_bridge_config = replace_entities(extra_bridge_path)
+    astra_bridge_config = replace_entities(astra_bridge_path)
+    a010_bridge_config = replace_entities(a010_bridge_path)
+    g_mov_bridge_config = replace_entities(g_mov_bridge_path)
+    os30a_bridge_config = replace_entities(os30a_bridge_path)
+
+
     # Generate launch description
     ld = LaunchDescription(ARGS)
 
 
-    # Node for GZ
-    gz_spawn_entity = Node(
-        package='ros_gz_sim',
-        executable='create',
-        output='screen',
-        arguments=['-topic', 'robot_description', '-name',
-                   'orion', '-allow_renaming', 'true', '-z', '0.1'],
+    spawn_include = IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(spawn_file),
+            launch_arguments= {
+                "camera": LaunchConfiguration('camera'),
+                "servo": LaunchConfiguration('servo'),
+                "g_mov": LaunchConfiguration('g_mov'), 
+                "rasp": LaunchConfiguration('rasp'),
+                "ros2_control": "true",
+                "x": LaunchConfiguration('x'), 
+                "y": LaunchConfiguration('y'), 
+                "z": LaunchConfiguration('z'),
+                "roll": LaunchConfiguration('R'), 
+                "pitch": LaunchConfiguration('P'), 
+                "yaw": LaunchConfiguration('Y'),
+                "world": LaunchConfiguration('world'),
+                "entity": LaunchConfiguration('entity'), 
+                "ros_bridge": "true",
+            }.items(),
+        )
+    
+    # General bridge for tfs and joint state
+    ld.add_action(
+       Node(
+               package='ros_gz_bridge',
+               name="ros_gz_bridge_base",
+               executable='parameter_bridge',
+               parameters=[{
+                'config_file': extra_bridge_config
+                }],
+                output='screen',
+           ),
+    )
+
+    # Launch astra_s bridge between ROS and GZ
+    ld.add_action(
+       Node(
+               package='ros_gz_bridge',
+               name="ros_gz_bridge_astra_s",
+               executable='parameter_bridge',
+               parameters=[{
+                'config_file': astra_bridge_config
+                }],
+                output='screen',
+                condition=IfCondition(PythonExpression(
+                    ["'", LaunchConfiguration('camera'), "' == 'astra_s'"])),
+           ),
+    )
+
+    # Launch a010 bridge between ROS and GZ
+    ld.add_action(
+       Node(
+               package='ros_gz_bridge',
+               name="ros_gz_bridge_a010",
+               executable='parameter_bridge',
+               parameters=[{
+                'config_file': a010_bridge_config
+                }],
+                output='screen',
+                condition=IfCondition(PythonExpression(
+                    ["'", LaunchConfiguration('camera'), "' == 'a010'"])),
+           ),
+    )
+
+    # Launch g_mov bridge between ROS and GZ
+    ld.add_action(
+       Node(
+               package='ros_gz_bridge',
+               name="ros_gz_bridge_g_mov",
+               executable='parameter_bridge',
+               parameters=[{
+                'config_file': g_mov_bridge_config
+                }],
+                output='screen',
+                condition=IfCondition(LaunchConfiguration('g_mov')),
+           ),
+    )
+
+    # Launch os30a bridge between ROS and GZ
+    ld.add_action(
+       Node(
+               package='ros_gz_bridge',
+               name="ros_gz_bridge_os30a",
+               executable='parameter_bridge',
+               parameters=[{
+                'config_file': os30a_bridge_config
+                }],
+                output='screen',
+                condition=IfCondition(PythonExpression(
+                    ["'", LaunchConfiguration('camera'), "' == 'os30a'"])),
+           ),
     )
 
     joint_state_broadcaster_spawner = Node(
@@ -110,6 +190,7 @@ def generate_launch_description():
         executable='spawner',
         arguments=['joint_state_broadcaster'],
     )
+
     diff_drive_base_controller_spawner = Node(
         package='controller_manager',
         executable='spawner',
@@ -120,29 +201,13 @@ def generate_launch_description():
             ],
     )
 
-    # Bridge
-    bridge = Node(
-        package='ros_gz_bridge',
-        executable='parameter_bridge',
-        arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
-        output='screen'
-    )
+    ld.add_action(spawn_include)
 
-    ld.add_action(IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(
-                [PathJoinSubstitution([FindPackageShare('ros_gz_sim'),
-                                       'launch',
-                                       'gz_sim.launch.py'])]),
-            launch_arguments=[('gz_args', [' -r -v 3 empty.sdf'])])
-    )
-    ld.add_action(
-        RegisterEventHandler(
-            event_handler=OnProcessExit(
-                target_action=gz_spawn_entity,
-                on_exit=[diff_drive_base_controller_spawner],
-            )
-        )
-    )
+    # Timer to delay the execution of diff_drive_base_controller_spawner
+    ld.add_action( TimerAction(
+        period=15.0,  # 30 seconds delay
+        actions=[diff_drive_base_controller_spawner]
+    ))
 
     ld.add_action(RegisterEventHandler(
             event_handler=OnProcessExit(
@@ -151,11 +216,5 @@ def generate_launch_description():
             )
         )
     )
-
-    ld.add_action(bridge)
-    ld.add_action(gz_spawn_entity)
-    
-    # Add robot description with context
-    ld.add_action(OpaqueFunction(function=generate_robot_description))
     
     return ld

@@ -27,7 +27,7 @@ ARGS = [
         description="Select 4 for Raspberry Pi 4B, or 5 for Raspberry Pi 5"),
     DeclareLaunchArgument('gazebo',default_value='true',
         description="True for using gazebo tags, false otherwise"),
-    DeclareLaunchArgument('world', default_value='empty.sdf',
+    DeclareLaunchArgument('world', default_value='custom_empty.sdf',
         description='Specify the world file for Gazebo'),
     DeclareLaunchArgument('x', default_value='0.0', 
         description='Initial X position'),
@@ -95,6 +95,7 @@ def generate_launch_description():
                 "servo": LaunchConfiguration('servo'),
                 "g_mov": LaunchConfiguration('g_mov'), 
                 "rasp": LaunchConfiguration('rasp'),
+                "ros2_control": "false",
                 "x": LaunchConfiguration('x'), 
                 "y": LaunchConfiguration('y'), 
                 "z": LaunchConfiguration('z'),
@@ -118,7 +119,7 @@ def generate_launch_description():
                 'config_file': base_bridge_config
                 }],
                 output='screen',
-                condition=IfCondition(LaunchConfiguration('servo')),
+                condition=IfCondition(LaunchConfiguration('ros_bridge')),
            ),
     )
     
@@ -132,7 +133,7 @@ def generate_launch_description():
                 'config_file': servo_bridge_config
                 }],
                 output='screen',
-                condition=IfCondition(LaunchConfiguration('ros_bridge')),
+                condition=IfCondition(LaunchConfiguration('servo')),
            ),
     )
     

@@ -23,7 +23,9 @@ ARGS = [
         description="Select 4 for Raspberry Pi 4B, or 5 for Raspberry Pi 5"),
     DeclareLaunchArgument('gazebo',default_value='true',
         description="True for using gazebo tags, false otherwise"),
-    DeclareLaunchArgument('world', default_value='empty.sdf',
+    DeclareLaunchArgument('ros2_control', default_value='false',
+        description="Whether to use ros2_control tags for motor controllers"),
+    DeclareLaunchArgument('world', default_value='custom_empty.sdf',
         description='Specify the world file for Gazebo'),
     DeclareLaunchArgument('x', default_value='0.0', 
         description='Initial X position'),
@@ -66,7 +68,8 @@ def generate_launch_description():
                 "servo": LaunchConfiguration('servo'),
                 "g_mov": LaunchConfiguration('g_mov'), 
                 "rasp": LaunchConfiguration('rasp'),
-                "gazebo": 'true'
+                "gazebo": 'true',
+                "ros2_control": LaunchConfiguration("ros2_control")
             }.items(),
         )
     )
