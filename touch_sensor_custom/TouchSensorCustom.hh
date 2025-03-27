@@ -14,14 +14,14 @@ namespace touch_sensor
         public: virtual bool Update(
             const std::chrono::steady_clock::duration &_now) override;
         
-        public: bool getContact() const;
+        public: void NewContact(bool contact);
 
         private: bool contact {false};
 
         private: gz::transport::Node node;
 
         private: gz::transport::Node::Publisher pub;
-    }
+    };
 }
 
 #endif

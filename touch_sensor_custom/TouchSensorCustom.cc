@@ -8,7 +8,7 @@
 
 using namespace touch_sensor;
 
-bool TouchSensor::Load(const std::Sensor &_sdf)
+bool TouchSensor::Load(const sdf::Sensor &_sdf)
 {
     auto type = gz::sensors::customType(_sdf);
     if ("touch" != type)
@@ -40,7 +40,23 @@ bool TouchSensor::Load(const std::Sensor &_sdf)
     return true;
 }
 
-bool TouchSensor::Update(const std::chrono::steady_clock::duration &now)
+bool TouchSensor::Update(const std::chrono::steady_clock::duration &_now)
 {
     gz::msgs::Boolean msg;
+    *msg.mutable_header()->mutable_stamp() = gz::msgs::Convert(_now);
+    auto frame = msg.mutable_header()->add_data();
+    frame->set_key("frame_id");
+    frame->add_value(this->Name());
+
+    msg.set_data(this->contact);
+    this->AddSequence(msg.mutable_header());
+    this->pub.Publish(msg);
+
+    return true;
+
+}
+
+void TouchSensor::NewContact(bool contact)
+{
+    this->contact = contact;
 }
