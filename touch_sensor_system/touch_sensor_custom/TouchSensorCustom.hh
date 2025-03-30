@@ -5,22 +5,24 @@
 #include<gz/sensors/SensorTypes.hh>
 #include<gz/transport/Node.hh>
 
-namespace touch_sensor
+namespace custom
 {
     class TouchSensor : public gz::sensors::Sensor
     {
-        public: virtual bool Load(const sdf::Sensor &_sdf) override;
+    public: 
+        virtual bool Load(const sdf::Sensor &_sdf) override;
 
-        public: virtual bool Update(
+        virtual bool Update(
             const std::chrono::steady_clock::duration &_now) override;
         
-        public: void NewContact(bool contact);
+        void NewContact(bool contact);
 
-        private: bool contact {false};
+    private: 
+        bool contact {false};
 
-        private: gz::transport::Node node;
+        gz::transport::Node node;
 
-        private: gz::transport::Node::Publisher pub;
+        gz::transport::Node::Publisher pub;
     };
 }
 

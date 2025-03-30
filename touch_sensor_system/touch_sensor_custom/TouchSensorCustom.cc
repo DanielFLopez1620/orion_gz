@@ -6,7 +6,7 @@
 
 #include "TouchSensorCustom.hh"
 
-using namespace touch_sensor;
+using namespace custom;
 
 bool TouchSensor::Load(const sdf::Sensor &_sdf)
 {
@@ -24,16 +24,16 @@ bool TouchSensor::Load(const sdf::Sensor &_sdf)
 
     if (!_sdf.Element()->HasElement("gz:touch"))
     {
-        gzerr << "No custom configuration for [" << this->Topic() << "]"
+        gzdbg << "No custom configuration for [" << this->Topic() << "]"
               << std::endl;
-        return false;
+        return true;
     }
 
     auto customElement = _sdf.Element()->GetElement("gz:touch");
     if (!customElement->HasElement("contact_link_name"))
     {
-        gzerr << "Failed to load contact link" << std::endl;
-        return false;
+        gzdbg << "Failed to load contact link" << std::endl;
+        return true;
     }
 
     gzmsg << "Found contact for touch sensor..."<< std::endl;
