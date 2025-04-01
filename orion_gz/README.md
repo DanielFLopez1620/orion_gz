@@ -3,6 +3,7 @@
 ## Overview
 
 Package oriented to the usage of the simulator GZ Sim (Harmonic) with the ORION robot.
+
 ## License
 
 The source code is released under a [BSD 3-Clause license](/LICENSE).
@@ -11,13 +12,11 @@ The source code is released under a [BSD 3-Clause license](/LICENSE).
 
 The orion_gz package has been tested under [ROS](https://www.ros.org/) Jazzy.
 
-## Installation
-
-...
-
 ## Usage
 
-### Spawn robot:
+Make sure you have followed the [installation_process](/README.md) and have sourced your workspace before you continue:
+
+### Spawn robot
 
 Spawn the robot in a given world of the simulator GZ Sim by considering the [spawn_robot.launch.py](/orion_gz/launch/spawn_robot.launch.py) file, which also loads the configurations from the **orion_description** package.
 
@@ -41,7 +40,7 @@ Spawn the robot in a given world of the simulator GZ Sim by considering the [spa
 ros2 launch orion_gz spawn_robot.launch.py camera:=astra_s 
 ~~~
 
-### Gazebo launch with ROS Brige:
+### Gazebo launch with ROS Brige
 
 Spawn the robot and includes the proper bridges to make possible the communication between GZ Harmonic and ROS 2 Jazzy, by using the configs provided in [model_vis.launch.py](/orion_description/launch/model_vis.launch.py) file, which also loads the configurations from the **orion_description** package.
 
