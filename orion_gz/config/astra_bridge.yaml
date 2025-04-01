@@ -2,7 +2,7 @@
 # - <entity> : Should be replaced by entity name: For example "robot".
 
 # RGBD Camera ORBBEC Astra S
-- ros_topic_name: "/camere_astra/image_raw"
+- ros_topic_name: "/camera_astra/image_raw"
   gz_topic_name: "/world/<world>/model/<entity>/link/base_link/sensor/camera/image"
   ros_type_name: "sensor_msgs/msg/Image"
   gz_type_name: "gz.msgs.Image"
