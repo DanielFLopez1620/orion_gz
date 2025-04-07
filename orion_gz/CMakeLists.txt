@@ -10,7 +10,7 @@ find_package(ament_cmake REQUIRED)
 find_package(orion_description REQUIRED)
 
 install(
-  DIRECTORY launch model config world
+  DIRECTORY launch config world urdf
   DESTINATION share/${PROJECT_NAME}
 )
 

@@ -18,11 +18,11 @@ from controller_manager.launch_utils import generate_load_controller_launch_desc
 
 # //////////////////////////// GLOBAL DEFINITIONS //////////////////////////////
 ARGS = [
-    DeclareLaunchArgument('camera', default_value='a010',
+    DeclareLaunchArgument('camera', default_value='os30a',
         description="Choose a cam for the robot (os30a, astra_s, a010)"),
     DeclareLaunchArgument('servo',default_value='true',
         description="Boolean to include or not the servos"),
-    DeclareLaunchArgument('g_mov',default_value='true',
+    DeclareLaunchArgument('g_mov',default_value='false',
         description="When using camera a010, whether to include or not G Mov"),
     DeclareLaunchArgument('rasp', default_value='rpi5',
         description="Select 4 for Raspberry Pi 4B, or 5 for Raspberry Pi 5"),

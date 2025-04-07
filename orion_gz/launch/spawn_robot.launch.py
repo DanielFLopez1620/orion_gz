@@ -13,11 +13,11 @@ from launch_ros.actions import Node
 
 # //////////////////////////// GLOBAL DEFINITIONS //////////////////////////////
 ARGS = [
-    DeclareLaunchArgument('camera', default_value='a010',
+    DeclareLaunchArgument('camera', default_value='os30a',
         description="Choose a cam for the robot (os30a, astra_s, a010)"),
     DeclareLaunchArgument('servo',default_value='true',
         description="Boolean to include or not the servos"),
-    DeclareLaunchArgument('g_mov',default_value='true',
+    DeclareLaunchArgument('g_mov',default_value='false',
         description="When using camera a010, whether to include or not G Mov"),
     DeclareLaunchArgument('rasp', default_value='rpi5',
         description="Select 4 for Raspberry Pi 4B, or 5 for Raspberry Pi 5"),
@@ -51,10 +51,9 @@ def generate_launch_description():
     ld = LaunchDescription(ARGS)
 
     # Paths definitions
-    pkg_orion_description = get_package_share_directory('orion_description')
     pkg_orion_gz = get_package_share_directory('orion_gz')
     pkg_gz = get_package_share_directory('ros_gz_sim')
-    rsp_file = os.path.join(pkg_orion_description, 'launch', 'rsp.launch.py')
+    rsp_file = os.path.join(pkg_orion_gz, 'launch', 'rsp_gz.launch.py')
     gz_file = os.path.join(pkg_gz, 'launch', 'gz_sim.launch.py')
     world_path = PathJoinSubstitution([pkg_orion_gz,'world', LaunchConfiguration('world')])
     print(str(pkg_orion_gz))
