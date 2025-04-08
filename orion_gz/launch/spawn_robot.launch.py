@@ -56,7 +56,6 @@ def generate_launch_description():
     rsp_file = os.path.join(pkg_orion_gz, 'launch', 'rsp_gz.launch.py')
     gz_file = os.path.join(pkg_gz, 'launch', 'gz_sim.launch.py')
     world_path = PathJoinSubstitution([pkg_orion_gz,'world', LaunchConfiguration('world')])
-    print(str(pkg_orion_gz))
 
     # Include ORION Robot State Publisher
     ld.add_action(

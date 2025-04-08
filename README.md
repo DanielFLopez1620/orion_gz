@@ -20,7 +20,7 @@ The ORION Common packages have been tested under [ROS](https://www.ros.org/) Jaz
 
 ## Installation
 
-1. Follow the installation steps of **ORION Commons** as they are required for the simulation.
+1. Follow the installation steps of **[ORION Commons](https://github.com/Tesis-ORION/orion_common/blob/dev/README.md)** as they are required for the simulation.
 
 2. Clone this repository:
 
