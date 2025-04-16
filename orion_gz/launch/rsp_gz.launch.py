@@ -23,7 +23,9 @@ ARGS = [
     DeclareLaunchArgument('gazebo',default_value='true',
         description="True for using gazebo tags, false otherwise"),
     DeclareLaunchArgument('ros2_control', default_value='false',
-        description="Whether to use ros2_control tags for motor controllers")
+        description="Whether to use ros2_control tags for motor controllers"),
+    DeclareLaunchArgument('simplified', default_value='false',
+        description="To ignore no-functional components in the URDF description")
 ]
 
 # /////////////////////////// FUNCTIONS DEFINITIONS ////////////////////////////
@@ -52,7 +54,8 @@ def generate_robot_description(context):
         'g_mov': get_argument(context, "g_mov"),
         'rasp': get_argument(context, "rasp"),
         'gazebo': get_argument(context, "gazebo"),
-        'ros2_control': get_argument(context, "ros2_control")
+        'ros2_control': get_argument(context, "ros2_control"),
+        'simplified': get_argument(context, 'simplified')
     }
 
     # Obtaining robot description and making the substitution

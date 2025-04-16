@@ -7,6 +7,7 @@
     <xacro:property name="rasp" default="$(arg rasp)"/>
     <xacro:property name="gazebo" default="$(arg gazebo)"/>
     <xacro:property name="ros2_control" default="$(arg ros2_control)"/>
+    <xacro:property name="simplified" default="true"/>
 
     <!-- For colors consider mdf, transparent or pla -->
     <xacro:property name="color" default="mdf"/>

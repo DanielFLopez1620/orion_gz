@@ -42,7 +42,9 @@ ARGS = [
     DeclareLaunchArgument('entity', default_value='orion',
         description='Entity name or your preferred name for the robot'),
     DeclareLaunchArgument('ros_bridge', default_value='false',
-        description='Boolean flag to indicate the usage of the ROS-GZ bridge')
+        description='Boolean flag to indicate the usage of the ROS-GZ bridge'),
+    DeclareLaunchArgument('simplified', default_value='false',
+        description="To ignore no-functional components in the URDF description")
 ]
 
 # ///////////////////////////// LAUNCH DEFINITION /////////////////////////////
@@ -67,7 +69,8 @@ def generate_launch_description():
                 "g_mov": LaunchConfiguration('g_mov'), 
                 "rasp": LaunchConfiguration('rasp'),
                 "gazebo": 'true',
-                "ros2_control": LaunchConfiguration("ros2_control")
+                "ros2_control": LaunchConfiguration("ros2_control"),
+                "simplified": LaunchConfiguration("simplified")
             }.items(),
         )
     )
