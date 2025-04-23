@@ -48,6 +48,20 @@ ARGS = [
 
 # /////////////////////////// FUNCTION DEFINITIONS ////////////////////////////
 def replace_entities(path):
+    """
+    Function oriented to replace the elements of the bridge config so it adapts
+    to the world and the entity.
+
+    Params
+    ---
+    path : String
+        Path to the .yaml file that contains the ros-gz bridge config
+
+    Returns
+    ---
+    bridge : String
+        Replaced .yaml config for launching the bridge
+    """
     config_file = ReplaceString(
         source_file=path,
         replacements={
@@ -61,6 +75,23 @@ def replace_entities(path):
         )
 
 def load_controllers(context):
+    """
+    Load controllers by considering OpaqueFunctions to allow all of them to load
+    in a asynchronous way.
+
+    It is used as recommended in:
+    https://github.com/pal-robotics/tiago_robot/blob/humble-devel/tiago_controller_configuration/launch/default_controllers.launch.py
+
+    Params
+    ---
+    Context : context
+        Context provided by OpaqueFunction
+
+    Returns
+    ---
+    controller : Array of launch description actions
+        Actions linked to the controllers spawners
+    """
     pkg_ctl = get_package_share_directory('orion_control')
     mobile_base_path = os.path.join(pkg_ctl, 'config', 'mobile_base_controller.yaml')  
     left_arm_path = os.path.join(pkg_ctl, 'config', 'simple_left_arm_controller.yaml')
@@ -98,10 +129,17 @@ def load_controllers(context):
             controller_name="g_mov_servo_controller",
             controller_params_file=g_mov_path
         ))
+
     return controllers
 
 # /////////////////////////// LAUNCH DEFINITIONS //////////////////////////////
 def generate_launch_description():
+    """
+    Launch configuration oriented to load a robot state, load it to spawn a
+    robot in Gazebo and configure the ros-gz bridge for making possible
+    the exchange fo information of the sensor, while also connecting and loading
+    the ros2_controllers that were set up in the GZ simulation.
+    """
     
     # Path definitions
     pkg_gz = get_package_share_directory('orion_gz')

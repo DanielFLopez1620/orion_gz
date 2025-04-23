@@ -51,6 +51,20 @@ ARGS = [
 
 # /////////////////////////// FUNCTION DEFINITIONS ////////////////////////////
 def replace_entities(path):
+    """
+    Function oriented to replace the elements of the bridge config so it adapts
+    to the world and the entity.
+
+    Params
+    ---
+    path : String
+        Path to the .yaml file that contains the ros-gz bridge config
+
+    Returns
+    ---
+    bridge : String
+        Replaced .yaml config for launching the bridge
+    """
     config_file = ReplaceString(
         source_file=path,
         replacements={
@@ -66,6 +80,12 @@ def replace_entities(path):
 
 # /////////////////////////// LAUNCH DEFINITION ///////////////////////////////
 def generate_launch_description():
+    """
+    Launch configuration oriented to load a robot state, load it to spawn a
+    robot in Gazebo and configure the ros-gz bridge for making possible
+    the interaction between the simulation and the ROS 2 ecosystem.
+    """
+
     # Generate launch descripiton
     ld = LaunchDescription(ARGS)
 

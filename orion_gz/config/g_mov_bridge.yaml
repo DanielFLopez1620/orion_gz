@@ -1,5 +1,7 @@
 # Placeholders to be rewritten by launch file:
 # - <entity> : Should be replaced by entity name: For example "robot".
+# - <world> : Correspond to the world name, the world name must be consistent with
+#   the file name, for example, 'empty.sdf' world should be called 'empty' inside.
 
 # Servo G-Mov
 - ros_topic_name: "/g_mov_joint/cmd_pos"
