@@ -19,13 +19,17 @@ from controller_manager.launch_utils import generate_load_controller_launch_desc
 # //////////////////////////// GLOBAL DEFINITIONS //////////////////////////////
 ARGS = [
     DeclareLaunchArgument('camera', default_value='os30a',
-        description="Choose a cam for the robot (os30a, astra_s, a010)"),
+        description="Choose a cam for the robot (os30a, astra_s, a010)",
+        choices=['os30a', 'astra_s', 'a010']),
     DeclareLaunchArgument('servo',default_value='true',
-        description="Boolean to include or not the servos"),
+        description="Boolean to include or not the servos",
+        choices=['true', 'false']),
     DeclareLaunchArgument('g_mov',default_value='false',
-        description="When using camera a010, whether to include or not G Mov"),
+        description="When using camera a010, whether to include or not G Mov",
+        choices=['true', 'false']),
     DeclareLaunchArgument('rasp', default_value='rpi5',
-        description="Select 4 for Raspberry Pi 4B, or 5 for Raspberry Pi 5"),
+        description="Select 4 for Raspberry Pi 4B, or 5 for Raspberry Pi 5",
+        choices=['rpi4', 'rpi5']),
     DeclareLaunchArgument('world', default_value='custom_empty.sdf',
         description='Specify the world file for Gazebo'),
     DeclareLaunchArgument('x', default_value='0.0', 
@@ -43,7 +47,8 @@ ARGS = [
     DeclareLaunchArgument('entity', default_value='orion',
         description='Entity name or your preferred name for the robot'),
     DeclareLaunchArgument('simplified', default_value='false',
-        description="To ignore no-functional components in the URDF description")
+        description="To ignore no-functional components in the URDF description",
+        choices=['true', 'false'])
 ]
 
 # /////////////////////////// FUNCTION DEFINITIONS ////////////////////////////
