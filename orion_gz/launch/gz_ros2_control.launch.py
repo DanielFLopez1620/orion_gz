@@ -109,14 +109,7 @@ def load_controllers(context):
             controller_name="mobile_base_controller",
             controller_params_file=mobile_base_path)
     ]
-    
-    controllers.append(generate_load_controller_launch_description(
-        controller_name="joint_state_broadcaster",
-        controller_params_file=joint_broad_path
-    ))
-
-    
-    
+        
     # Check if the servo argument is true
     if LaunchConfiguration('servo').perform(context) == 'true':
         controllers.append(generate_load_controller_launch_description(
@@ -134,6 +127,11 @@ def load_controllers(context):
             controller_name="g_mov_servo_controller",
             controller_params_file=g_mov_path
         ))
+
+    controllers.append(generate_load_controller_launch_description(
+        controller_name="joint_state_broadcaster",
+        controller_params_file=joint_broad_path
+    ))
 
     return controllers
 
