@@ -23,7 +23,7 @@
                 <min_angular_velocity>-2.791666667</min_angular_velocity>
                 <odom_publish_frequency>30</odom_publish_frequency>
                 <frame_id>odom</frame_id>
-                <child_frame_id>base_footprint</child_frame_id>
+                <child_frame_id>base_link</child_frame_id>
             </plugin>
         </gazebo>
 
