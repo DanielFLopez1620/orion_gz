@@ -8,6 +8,7 @@
     <xacro:property name="gazebo" default="$(arg gazebo)"/>
     <xacro:property name="ros2_control" default="$(arg ros2_control)"/>
     <xacro:property name="simplified" default="true"/>
+    <xacro:property name="motor" value="100"/>
 
     <!-- For colors consider mdf, transparent or pla -->
     <xacro:property name="color" default="mdf"/>
