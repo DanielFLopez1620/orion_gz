@@ -10,7 +10,7 @@ The source code is released under a [BSD 3-Clause license](/LICENSE).
 
 **Author**: [Daniel Felipe López Escobar](https://github.com/DanielFLopez1620).
 
-The orion_gz package has been tested under [ROS](https://www.ros.org/) Jazzy.
+The orion_gz package has been tested under [ROS](https://www.ros.org/) Jazzy and GZ [Harmonic](https://gazebosim.org/docs/harmonic/getstarted/).
 
 ## 📚 Table of Contents
 
@@ -19,9 +19,11 @@ The orion_gz package has been tested under [ROS](https://www.ros.org/) Jazzy.
 - [⚙️ Params and configs](#️-params-and-configs)
 - [⚠️ Troubleshooting](#️-troubleshooting)
 
+---
+
 ## 🚀 Launch files
 
-Make sure you have followed the [installation_process](/README.md) and have sourced your workspace before you continue:
+Make sure you have followed the [installation_process](/README.md) for the GZ package and the [ORION common](https://github.com/Tesis-ORION/orion_common) repository, also you should have sourced your workspace before you continue:
 
 ### Robot State Publisher for Gazebo
 
@@ -72,7 +74,7 @@ ros2 launch orion_gz spawn_robot.launch.py camera:=astra_s
 
 ### Gazebo launch with ROS Brige
 
-Spawn the robot and includes the proper bridges to make possible the communication between GZ Harmonic and ROS 2 Jazzy, by using the configs provided in [model_vis.launch.py](/orion_description/launch/model_vis.launch.py) file, which also loads the configurations from the **orion_description** package.
+Spawn the robot and includes the proper bridges to make possible the communication between GZ Harmonic and ROS 2 Jazzy, by using the configs provided in [orion_gz.launch.py](/orion_gz/launch/gz_ros.launch.py) file, which also loads the configurations from the **orion_description** package.
 
 ~~~bash
 # Basic usage:
@@ -120,6 +122,8 @@ ros2 launch orion_gz gz_ros2_control.launch.py rasp:=rpi4 camera:=os30a
 
 ![gz_ros2_control_launch](https://github.com/Tesis-ORION/orion_common/blob/main/docs/readmes/gz_ros2_control.gif)
 
+---
+
 ## ⚙️ RViz2 Configs
 
 ### vis_a010.rviz
@@ -137,6 +141,8 @@ This config will allow the set up for visualizing the Depth Camera OS30A conside
 ### visualization.rviz
 
 Simple visualization of the robot state and sensors with a focus on the base_link of the robot.
+
+---
 
 ## ⚙️ Params and configs
 
@@ -172,9 +178,13 @@ Param bridge intended to be used when having **ros2_control** so you can access 
 
 Focused on the commands from ROS to GZ of the arms' servos when using native GZ plugins on the simulation.
 
+---
+
 ## 🗒️ Additional comments
 
 - By default, the **rgdb** and **depth** cameras' **point clouds** were disabled due to high overload and slow the processing of the simulation. If you want to activate them, go to the [config](/orion_gz/config/) dir, search for the .yaml file of the camera you want to use and uncomment the point cloud arg.
+
+---
 
 ## ⚠️ Troubleshooting
 

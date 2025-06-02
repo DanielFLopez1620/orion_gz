@@ -40,7 +40,6 @@ The ORION Common packages have been tested under [ROS](https://www.ros.org/) Jaz
 
     ~~~bash
     cd ~/ros2_ws/src
-    # For now, the project is in the development branch
     git clone https://github.com/Tesis-ORION/orion_gz.git
     ~~~
 
@@ -48,7 +47,7 @@ The ORION Common packages have been tested under [ROS](https://www.ros.org/) Jaz
 
     ~~~bash
     cd ~/ros2_ws
-    git clone rosdep install --from-paths src --ignore-src -r -y
+    rosdep install --from-paths src --ignore-src -r -y
     ~~~
 
 4. Build the simulation package.
