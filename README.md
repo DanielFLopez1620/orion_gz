@@ -1,12 +1,14 @@
-# ORION Gazebo Sim
+# 🤖 ORION Gazebo Sim
 
-## Overview
+![orion_gz_demo](/orion_gz/resources/orion_gz_demo.gif)
 
-Package oriented to the basic usage of the ORION project, a ROS 2 differential robot oriented for Human-Robot Interaction applications.
+## 🌟 Overview
+
+Package oriented to the simulation of the ORION project, a ROS 2 differential robot oriented for Human-Robot Interaction applications, in Gazebo Sim Harmonic.
 
 **Keywords:** ROS 2, Differential, HRI, ROS 2 Jazzy, low-cost.
 
-## License
+## 📝 License
 
 The source code is released under a [BSD 3-Clause license](/LICENSE).
 
@@ -14,20 +16,32 @@ The source code is released under a [BSD 3-Clause license](/LICENSE).
 
 The ORION Common packages have been tested under [ROS](https://www.ros.org/) Jazzy.
 
-## Package summary
+---
 
-- **[orion_gz](/orion_gz/README.md):** Package for simulation of the robot in GZ Sim.
+## 📚 Table of Contents
 
-## Installation
+- [📦 Package summary](#-package-summary)
+- [📥 Installation](#-installation)
+- [⚠️ Troubleshooting](#️-troubleshooting)
 
-1. Follow the installation steps of **[ORION Commons](https://github.com/Tesis-ORION/orion_common/blob/dev/README.md)** as they are required for the simulation.
+---
+
+## 📦 Package summary
+
+- **[orion_gz](/orion_gz/README.md):** Package for simulation of the robot in GZ Sim so you can use GZ plugins, gz_ros2_control, ros_gz_bridges and custom worlds to use a simulated version of ORION.
+
+    ![orion_gz_packages](/orion_gz/resources/orion_gz_packages.gif)
+
+## 📥 Installation
+
+1. Follow the installation steps of **[ORION Commons](https://github.com/Tesis-ORION/orion_common)** as they are required for the simulation.
 
 2. Clone this repository:
 
     ~~~bash
     cd ~/ros2_ws/src
     # For now, the project is in the development branch
-    git clone -b https://github.com/Tesis-ORION/orion_gz.git
+    git clone https://github.com/Tesis-ORION/orion_gz.git
     ~~~
 
 3. Install the dependencies:
@@ -45,6 +59,8 @@ The ORION Common packages have been tested under [ROS](https://www.ros.org/) Jaz
     source install/setup.bash
     ~~~
 
-5. You are redy to explore the packages
+5. You are redy to explore the packages of this repository.
 
-**NOTE:** Do not build the plugins along the ROS Packages as they may lead to build errors.
+## ⚠️ Troubleshooting
+
+Explore the packages content as each README may contain some easy tips on how to solve some common problems.
