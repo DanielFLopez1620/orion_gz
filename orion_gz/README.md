@@ -197,3 +197,41 @@ This may depend on your machine resources, as ORION contains multiple plugins fo
 - Check that GZ Sim is using your GPU card (if you have one).
 
 - If you do not require depth image, you can comment the brigde, similar to what was suggested on the **Additional notes section**.
+
+### Problems adding new world
+
+Currently there are 3 supported world, if you want to explore with another one, it is recommended to clone it into the [worlds](/orion_gz/world/) directory, ensuring that the name of the file and the name of the world are the same excluding the extension, for example, if you want to add a world called *park.sdf*, then the name of the world should be *park*.
+
+If you do not respect this convention, the GZ topics convention name for ORION will fail. You can validate this by going to the different config files of the GZ bridge in the [config](/orion_gz/config/) directory.
+
+### ROS topic for a sensor / actuator doesn't exists
+
+Remeber that the connections between GZ and ROS 2 are possible by using bridges, there are certain definitions made. However, there are possibilities of mismatches or missing topics. In this cases, run the simulation with your prefered args, then proceed:
+
+1. Open a terminal and list the topics:
+
+    ~~~bash
+    gz topic -l
+    ~~~
+
+2. Here we will suppose the LIDAR topic is missing on ROS2, so we drag our attention to the LIDAR gz topic:
+
+    ~~~bash
+    gz topic -l | grep scan
+    # In my case is:
+    # /world/custom_empty/model/orion/link/base_link/sensor/gpu_lidar/scan
+    ~~~
+
+3. Check the information about the topic:
+
+    ~~~bash
+    gz topic -i -t /world/custom_empty/model/orion/link/base_link/sensor/gpu_lidar/scan
+
+    # It returned:
+    # Publishers [Address, Message Type]:
+    # tcp://172.18.0.1:36933, gz.msgs.LaserScan
+    ~~~
+
+4. Check the pair of the topic for the **ros_gz_bridge** on the official [repo](https://github.com/gazebosim/ros_gz/blob/jazzy/ros_gz_bridge/README.md)
+
+5. Add the config to a bridge file, based on the type and purpose review the **Params and configs** sections and then try again your launch, ensuring that the parameters are valid to call the edited config file.

@@ -51,7 +51,10 @@ ARGS = [
         choices=['true', 'false']),
     DeclareLaunchArgument('simplified', default_value='false',
         description="To ignore no-functional components in the URDF description",
-        choices=['true', 'false'])
+        choices=['true', 'false']),
+    DeclareLaunchArgument('motor', default_value='100',
+        description="Select your  motor nominal speed (rpm) at 12V",
+        choices=['1000', '100']),
 ]
 
 # ///////////////////////////// LAUNCH DEFINITION /////////////////////////////
@@ -76,8 +79,9 @@ def generate_launch_description():
                 "g_mov": LaunchConfiguration('g_mov'), 
                 "rasp": LaunchConfiguration('rasp'),
                 "gazebo": 'true',
-                "ros2_control": LaunchConfiguration("ros2_control"),
-                "simplified": LaunchConfiguration("simplified")
+                "ros2_control": LaunchConfiguration('ros2_control'),
+                "simplified": LaunchConfiguration('simplified'),
+                "motor": LaunchConfiguration('motor')
             }.items(),
         )
     )
@@ -125,4 +129,5 @@ def generate_launch_description():
         )
     )
 
+    # Return launch description
     return ld

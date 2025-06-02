@@ -32,7 +32,10 @@ ARGS = [
         choices=['true', 'false']),
     DeclareLaunchArgument('simplified', default_value='false',
         description="To ignore no-functional components in the URDF description",
-        choices=['true', 'false'])
+        choices=['true', 'false']),
+    DeclareLaunchArgument('motor', default_value='100',
+        description="Select your  motor nominal speed (rpm) at 12V",
+        choices=['1000', '100']),
 ]
 
 # /////////////////////////// FUNCTIONS DEFINITIONS ////////////////////////////
@@ -62,7 +65,8 @@ def generate_robot_description(context):
         'rasp': get_argument(context, "rasp"),
         'gazebo': get_argument(context, "gazebo"),
         'ros2_control': get_argument(context, "ros2_control"),
-        'simplified': get_argument(context, 'simplified')
+        'simplified': get_argument(context, 'simplified'),
+        'motor': get_argument(context, "motor")
     }
 
     # Obtaining robot description and making the substitution
@@ -98,4 +102,5 @@ def generate_launch_description():
     # Add robot description with context
     ld.add_action(OpaqueFunction(function=generate_robot_description))
     
+    # Return launch description
     return ld

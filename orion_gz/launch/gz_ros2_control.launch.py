@@ -49,7 +49,10 @@ ARGS = [
         description='Entity name or your preferred name for the robot'),
     DeclareLaunchArgument('simplified', default_value='false',
         description="To ignore no-functional components in the URDF description",
-        choices=['true', 'false'])
+        choices=['true', 'false']),
+    DeclareLaunchArgument('motor', default_value='100',
+        description="Select your  motor nominal speed (rpm) at 12V",
+        choices=['1000', '100']),
 ]
 
 # /////////////////////////// FUNCTION DEFINITIONS ////////////////////////////
@@ -184,6 +187,7 @@ def generate_launch_description():
                 "entity": LaunchConfiguration('entity'), 
                 "ros_bridge": "true",
                 "simplified": LaunchConfiguration('simplified'),
+                "motor": LaunchConfiguration('motor')
             }.items(),
         )
     
@@ -261,9 +265,11 @@ def generate_launch_description():
            ),
     )
 
-
+    # Include spawn 
     ld.add_action(spawn_include)
 
+    # Load controllers by using opaque functions
     ld.add_action(OpaqueFunction(function=load_controllers))
     
+    # Return launch description
     return ld

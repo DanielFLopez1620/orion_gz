@@ -54,7 +54,10 @@ ARGS = [
         choices=['true', 'false']),
     DeclareLaunchArgument('simplified', default_value='false',
         description="To ignore no-functional components in the URDF description",
-        choices=['true', 'false'])
+        choices=['true', 'false']),
+    DeclareLaunchArgument('motor', default_value='100',
+        description="Select your  motor nominal speed (rpm) at 12V",
+        choices=['1000', '100']),
 ]
 
 # /////////////////////////// FUNCTION DEFINITIONS ////////////////////////////
@@ -115,7 +118,6 @@ def generate_launch_description():
     g_mov_bridge_config = replace_entities(g_mov_bridge_path)
     os30a_bridge_config = replace_entities(os30a_bridge_path)
 
-
     # Include spawn orion robot
     ld.add_action(
         IncludeLaunchDescription(
@@ -136,6 +138,7 @@ def generate_launch_description():
                 "entity": LaunchConfiguration('entity'), 
                 "ros_bridge": LaunchConfiguration('ros_bridge'),
                 "simplified": LaunchConfiguration('simplified'),
+                "motor": LaunchConfiguration('motor')
             }.items(),
         )
     )
@@ -227,4 +230,5 @@ def generate_launch_description():
            ),
     )
 
+    # Return launch description
     return ld
