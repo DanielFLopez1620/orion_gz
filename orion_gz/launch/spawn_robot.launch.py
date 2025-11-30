@@ -31,8 +31,8 @@ ARGS = [
         description="Whether to use ros2_control tags for motor controllers"),
     DeclareLaunchArgument('world', default_value='custom_empty.sdf',
         description='Specify the world file for Gazebo',
-        choices=['custom_empty.sdf', 'simple_obstacles.sdf', 'more_obstacles.sdf']),
-    DeclareLaunchArgument('x', default_value='0.0', 
+        choices=['custom_empty.sdf', 'simple_obstacles.sdf', 'more_obstacles.sdf', 'turtle_world.sdf']),
+    DeclareLaunchArgument('x', default_value='0.0',
         description='Initial X position'),
     DeclareLaunchArgument('y', default_value='0.0',
         description='Initial Y position'),
@@ -59,7 +59,7 @@ ARGS = [
 
 # ///////////////////////////// LAUNCH DEFINITION /////////////////////////////
 def generate_launch_description():
-    # Generate launch descripiton
+    # Generate launch description
     ld = LaunchDescription(ARGS)
 
     # Paths definitions
@@ -74,9 +74,9 @@ def generate_launch_description():
             IncludeLaunchDescription(
             PythonLaunchDescriptionSource(rsp_file),
             launch_arguments= {
-                "camera": LaunchConfiguration('camera'), 
+                "camera": LaunchConfiguration('camera'),
                 "servo": LaunchConfiguration('servo'),
-                "g_mov": LaunchConfiguration('g_mov'), 
+                "g_mov": LaunchConfiguration('g_mov'),
                 "rasp": LaunchConfiguration('rasp'),
                 "gazebo": 'true',
                 "ros2_control": LaunchConfiguration('ros2_control'),

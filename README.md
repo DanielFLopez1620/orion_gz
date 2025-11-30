@@ -58,7 +58,7 @@ The ORION Common packages have been tested under [ROS](https://www.ros.org/) Jaz
     source install/setup.bash
     ~~~
 
-5. You are redy to explore the packages of this repository.
+5. You are ready to explore the packages of this repository.
 
 ## ⚠️ Troubleshooting
 

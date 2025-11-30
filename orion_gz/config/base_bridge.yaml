@@ -39,7 +39,7 @@
   direction: ROS_TO_GZ
 
 # Lidar
-- ros_topic_name: "scan"
+- ros_topic_name: "ldlidar_node/scan"
   gz_topic_name: "/world/<world>/model/<entity>/link/base_link/sensor/gpu_lidar/scan"
   ros_type_name: "sensor_msgs/msg/LaserScan"
   gz_type_name: "gz.msgs.LaserScan"

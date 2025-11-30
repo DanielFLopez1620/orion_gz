@@ -34,7 +34,7 @@ ARGS = [
         choices=['true', 'false']),
     DeclareLaunchArgument('world', default_value='custom_empty.sdf',
         description='Specify the world file for Gazebo',
-        choices=['custom_empty.sdf', 'simple_obstacles.sdf', 'more_obstacles.sdf']),
+        choices=['custom_empty.sdf', 'simple_obstacles.sdf', 'more_obstacles.sdf', 'turtle_world.sdf']),
     DeclareLaunchArgument('x', default_value='0.0', 
         description='Initial X position'),
     DeclareLaunchArgument('y', default_value='0.0',
@@ -103,12 +103,12 @@ def generate_launch_description():
     # Path definitions
     pkg_gz = get_package_share_directory('orion_gz')
     spawn_file = os.path.join(pkg_gz, 'launch', 'spawn_robot.launch.py')
-    base_bridge_path = os.path.join(pkg_gz, 'config', 'base_bridge.yaml')   
-    servo_bridge_path = os.path.join(pkg_gz, 'config', 'servo_bridge.yaml')  
-    astra_bridge_path = os.path.join(pkg_gz, 'config', 'astra_bridge.yaml')  
-    a010_bridge_path = os.path.join(pkg_gz, 'config', 'a010_bridge.yaml')  
-    g_mov_bridge_path = os.path.join(pkg_gz, 'config', 'g_mov_bridge.yaml')  
-    os30a_bridge_path = os.path.join(pkg_gz, 'config', 'os30a_bridge.yaml')  
+    base_bridge_path = os.path.join(pkg_gz, 'config', 'base_bridge.yaml')
+    servo_bridge_path = os.path.join(pkg_gz, 'config', 'servo_bridge.yaml')
+    astra_bridge_path = os.path.join(pkg_gz, 'config', 'astra_bridge.yaml')
+    a010_bridge_path = os.path.join(pkg_gz, 'config', 'a010_bridge.yaml')
+    g_mov_bridge_path = os.path.join(pkg_gz, 'config', 'g_mov_bridge.yaml')
+    os30a_bridge_path = os.path.join(pkg_gz, 'config', 'os30a_bridge.yaml')
 
     # Additional config set up
     base_bridge_config = replace_entities(base_bridge_path)
@@ -125,17 +125,17 @@ def generate_launch_description():
             launch_arguments= {
                 "camera": LaunchConfiguration('camera'),
                 "servo": LaunchConfiguration('servo'),
-                "g_mov": LaunchConfiguration('g_mov'), 
+                "g_mov": LaunchConfiguration('g_mov'),
                 "rasp": LaunchConfiguration('rasp'),
                 "ros2_control": "false",
-                "x": LaunchConfiguration('x'), 
-                "y": LaunchConfiguration('y'), 
+                "x": LaunchConfiguration('x'),
+                "y": LaunchConfiguration('y'),
                 "z": LaunchConfiguration('z'),
-                "roll": LaunchConfiguration('R'), 
-                "pitch": LaunchConfiguration('P'), 
+                "roll": LaunchConfiguration('R'),
+                "pitch": LaunchConfiguration('P'),
                 "yaw": LaunchConfiguration('Y'),
                 "world": LaunchConfiguration('world'),
-                "entity": LaunchConfiguration('entity'), 
+                "entity": LaunchConfiguration('entity'),
                 "ros_bridge": LaunchConfiguration('ros_bridge'),
                 "simplified": LaunchConfiguration('simplified'),
                 "motor": LaunchConfiguration('motor')
@@ -229,6 +229,14 @@ def generate_launch_description():
                     ["'", LaunchConfiguration('camera'), "' == 'os30a'"])),
            ),
     )
+
+    # Activate laser filter
+    ld.add_action(Node(
+        package='orion_utils_py',
+        executable='laser_filter',
+        name='laser_filter',
+        output='screen'
+    ))
 
     # Return launch description
     return ld

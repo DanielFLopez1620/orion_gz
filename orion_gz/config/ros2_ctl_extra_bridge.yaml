@@ -4,28 +4,28 @@
 #   the file name, for example, 'empty.sdf' world should be called 'empty' inside.
 
 # Joint State
-- ros_topic_name: "joint_states"
-  gz_topic_name: "world/<world>/model/<entity>/joint_state"
-  ros_type_name: "sensor_msgs/msg/JointState"
-  gz_type_name: "gz.msgs.Model"
-  direction: GZ_TO_ROS
+# - ros_topic_name: "joint_states"
+#  gz_topic_name: "world/<world>/model/<entity>/joint_state"
+#  ros_type_name: "sensor_msgs/msg/JointState"
+#  gz_type_name: "gz.msgs.Model"
+#  direction: GZ_TO_ROS
 
 # TF
-- ros_topic_name: "tf"
-  gz_topic_name: "/model/<entity>/tf"
-  ros_type_name: "tf2_msgs/msg/TFMessage"
-  gz_type_name: "gz.msgs.Pose_V"
-  direction: GZ_TO_ROS
+# - ros_topic_name: "tf"
+#   gz_topic_name: "/model/<entity>/tf"
+#   ros_type_name: "tf2_msgs/msg/TFMessage"
+#   gz_type_name: "gz.msgs.Pose_V"
+#   direction: GZ_TO_ROS
 
 # TF
-- ros_topic_name: "tf"
-  gz_topic_name: "/model/<entity>/pose"
-  ros_type_name: "tf2_msgs/msg/TFMessage"
-  gz_type_name: "gz.msgs.Pose_V"
-  direction: GZ_TO_ROS
+# - ros_topic_name: "tf"
+#   gz_topic_name: "/model/<entity>/pose"
+#   ros_type_name: "tf2_msgs/msg/TFMessage"
+#   gz_type_name: "gz.msgs.Pose_V"
+#   direction: GZ_TO_ROS
 
 # Lidar
-- ros_topic_name: "scan"
+- ros_topic_name: "ldlidar_node/scan"
   gz_topic_name: "/world/<world>/model/<entity>/link/base_link/sensor/gpu_lidar/scan"
   ros_type_name: "sensor_msgs/msg/LaserScan"
   gz_type_name: "gz.msgs.LaserScan"

@@ -94,6 +94,14 @@
             </xacro:if>
             </plugin>
         </gazebo>
+
+        <gazebo>
+            <plugin filename="gz-sim-joint-state-publisher-system" 
+                name="gz::sim::systems::JointStatePublisher">
+                <joint_name>caster_middle_2_joint</joint_name>
+                <joint_name>caster_wheel_2_joint</joint_name>
+            </plugin>
+        </gazebo>
     </xacro:unless>
 
     <xacro:if value="${ros2_control}">
@@ -139,6 +147,15 @@
                 <state_interface name="velocity" />
             </joint>
         </xacro:if>
+            <joint name="caster_middle_2_joint">
+                <state_interface name="position"/>
+                <state_interface name="velocity"/>
+            </joint>
+
+            <joint name="caster_wheel_2_joint">
+                <state_interface name="position"/>
+                <state_interface name="velocity"/>
+            </joint>
         </ros2_control>
 
         <gazebo>
@@ -147,12 +164,5 @@
             </plugin>
         </gazebo>
 
-        <gazebo>
-            <plugin filename="gz-sim-joint-state-publisher-system" 
-                name="gz::sim::systems::JointStatePublisher">
-                <joint_name>caster_middle_2_joint</joint_name>
-                <joint_name>caster_wheel_2_joint</joint_name>
-            </plugin>
-        </gazebo>
     </xacro:if>
 </robot>

@@ -101,6 +101,6 @@ def generate_launch_description():
 
     # Add robot description with context
     ld.add_action(OpaqueFunction(function=generate_robot_description))
-    
+
     # Return launch description
     return ld

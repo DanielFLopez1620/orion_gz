@@ -72,7 +72,7 @@ ros2 launch orion_gz spawn_robot.launch.py camera:=astra_s
 
 ![spawn_robot](https://github.com/Tesis-ORION/orion_common/blob/main/docs/readmes/spawn_robot.gif)
 
-### Gazebo launch with ROS Brige
+### Gazebo launch with ROS Bridge
 
 Spawn the robot and includes the proper bridges to make possible the communication between GZ Harmonic and ROS 2 Jazzy, by using the configs provided in [orion_gz.launch.py](/orion_gz/launch/gz_ros.launch.py) file, which also loads the configurations from the **orion_description** package.
 
@@ -99,7 +99,7 @@ ros2 launch orion_gz gz_ros.launch.py rasp:=rpi5 camera:=os30a
 
 ### Gazebo launch with ros2_control
 
-Spawn the robto and includes the configuration of bridges for sensors while also connecting the actuatores (servos and motors) with the proper ros2_control interface in order to interact with them. It considers a differential driver controller for the DC motors and forward controllers for the servo motors. For more information, check the file [gz_ros2_control.launch.py](/orion_gz/launch/gz_ros2_control.launch.py)
+Spawn the robot and includes the configuration of bridges for sensors while also connecting the actuators (servos and motors) with the proper ros2_control interface in order to interact with them. It considers a differential driver controller for the DC motors and forward controllers for the servo motors. For more information, check the file [gz_ros2_control.launch.py](/orion_gz/launch/gz_ros2_control.launch.py)
 
 ~~~bash
 # Basic usage:
@@ -156,7 +156,7 @@ Contains the elements to make the bridge to publish, from GZ to ROS 2, the camer
 
 ### base_bridge.yaml
 
-Containts the element to exchange the information of the base simulation of the robot. On one hand, from ROS to GZ, the cmd_vel topic. On the other hand, from GZ to ROS, the TF tree, the odom, the joint_states and the scan of the LIDAR.
+Contains the element to exchange the information of the base simulation of the robot. On one hand, from ROS to GZ, the cmd_vel topic. On the other hand, from GZ to ROS, the TF tree, the odom, the joint_states and the scan of the LIDAR.
 
 ### g_mov_bridge.yaml
 
@@ -164,7 +164,7 @@ Presents the information to publish from ROS to GZ in the case of the G_Mov serv
 
 ### g_mov_short_bridge.yaml
 
-Contains information to just use the Pi cam of the simualted version of the G-Mov module.
+Contains information to just use the Pi cam of the simulated version of the G-Mov module.
 
 ### os30a_bridge.yaml
 
@@ -192,7 +192,7 @@ Focused on the commands from ROS to GZ of the arms' servos when using native GZ 
 
 This may depend on your machine resources, as ORION contains multiple plugins for sensors and actuators with a full definition model, it may run slow sometimes. In those cases, you can implement the next solutions:
 
-- Use the simplified version of the robot, as it will ignore the meshes, links and joinst of inner parts. Keep in mind that this may affect the physic simulation.
+- Use the simplified version of the robot, as it will ignore the meshes, links and joints of inner parts. Keep in mind that this may affect the physic simulation.
 
     ~~~bash
     ros2 launch gz_ros2_control.launch.py simplified:=true
@@ -206,7 +206,7 @@ This may depend on your machine resources, as ORION contains multiple plugins fo
 
 - Check that GZ Sim is using your GPU card (if you have one).
 
-- If you do not require depth image, you can comment the brigde, similar to what was suggested on the **Additional notes section**.
+- If you do not require depth image, you can comment the bridge, similar to what was suggested on the **Additional notes section**.
 
 ### Problems adding new world
 
@@ -216,7 +216,7 @@ If you do not respect this convention, the GZ topics convention name for ORION w
 
 ### ROS topic for a sensor / actuator doesn't exists
 
-Remeber that the connections between GZ and ROS 2 are possible by using bridges, there are certain definitions made. However, there are possibilities of mismatches or missing topics. In this cases, run the simulation with your prefered args, then proceed:
+Remember that the connections between GZ and ROS 2 are possible by using bridges, there are certain definitions made. However, there are possibilities of mismatches or missing topics. In this cases, run the simulation with your preferred args, then proceed:
 
 1. Open a terminal and list the topics:
 

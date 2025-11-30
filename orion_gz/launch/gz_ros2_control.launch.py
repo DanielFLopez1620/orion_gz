@@ -5,7 +5,7 @@ import os
 # ............................ Launch dependencies .............................
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction, GroupAction
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction, GroupAction, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration, PythonExpression
@@ -85,24 +85,14 @@ def replace_entities(path):
 
 def load_controllers(context):
     """
-    Load controllers by considering OpaqueFunctions to allow all of them to load
-    in a asynchronous way.
+    Build the ros2_control_node and controller spawners dynamically, using
+    conditional activation and keeping the structure clean and scalable.
 
-    It is used as recommended in:
-    https://github.com/pal-robotics/tiago_robot/blob/humble-devel/tiago_controller_configuration/launch/default_controllers.launch.py
-
-    Params
-    ---
-    Context : context
-        Context provided by OpaqueFunction
-
-    Returns
-    ---
-    controller : Array of launch description actions
-        Actions linked to the controllers spawners
+    This function is compatible with OpaqueFunction.
     """
+
     pkg_ctl = get_package_share_directory('orion_control')
-    mobile_base_path = os.path.join(pkg_ctl, 'config', 'mobile_base_controller.yaml')  
+    mobile_base_path = os.path.join(pkg_ctl, 'config', 'mobile_base_controller.yaml')
     left_arm_path = os.path.join(pkg_ctl, 'config', 'simple_left_arm_controller.yaml')
     right_arm_path = os.path.join(pkg_ctl, 'config', 'simple_right_arm_controller.yaml')
     joint_broad_path = os.path.join(pkg_ctl, 'config', 'joint_state_broadcaster.yaml')
@@ -113,7 +103,7 @@ def load_controllers(context):
             controller_name="mobile_base_controller",
             controller_params_file=mobile_base_path)
     ]
-        
+
     # Check if the servo argument is true
     if LaunchConfiguration('servo').perform(context) == 'true':
         controllers.append(generate_load_controller_launch_description(
@@ -147,15 +137,15 @@ def generate_launch_description():
     the exchange fo information of the sensor, while also connecting and loading
     the ros2_controllers that were set up in the GZ simulation.
     """
-    
+
     # Path definitions
     pkg_gz = get_package_share_directory('orion_gz')
     spawn_file = os.path.join(pkg_gz, 'launch', 'spawn_robot.launch.py')
-    extra_bridge_path = os.path.join(pkg_gz, 'config', 'ros2_ctl_extra_bridge.yaml')   
-    astra_bridge_path = os.path.join(pkg_gz, 'config', 'astra_bridge.yaml')  
-    a010_bridge_path = os.path.join(pkg_gz, 'config', 'a010_bridge.yaml')  
-    g_mov_bridge_path = os.path.join(pkg_gz, 'config', 'g_mov_short_bridge.yaml')  
-    os30a_bridge_path = os.path.join(pkg_gz, 'config', 'os30a_bridge.yaml')  
+    extra_bridge_path = os.path.join(pkg_gz, 'config', 'ros2_ctl_extra_bridge.yaml')
+    astra_bridge_path = os.path.join(pkg_gz, 'config', 'astra_bridge.yaml')
+    a010_bridge_path = os.path.join(pkg_gz, 'config', 'a010_bridge.yaml')
+    g_mov_bridge_path = os.path.join(pkg_gz, 'config', 'g_mov_short_bridge.yaml')
+    os30a_bridge_path = os.path.join(pkg_gz, 'config', 'os30a_bridge.yaml')
 
     # Additional config set up
     extra_bridge_config = replace_entities(extra_bridge_path)
@@ -174,23 +164,23 @@ def generate_launch_description():
             launch_arguments= {
                 "camera": LaunchConfiguration('camera'),
                 "servo": LaunchConfiguration('servo'),
-                "g_mov": LaunchConfiguration('g_mov'), 
+                "g_mov": LaunchConfiguration('g_mov'),
                 "rasp": LaunchConfiguration('rasp'),
                 "ros2_control": "true",
-                "x": LaunchConfiguration('x'), 
-                "y": LaunchConfiguration('y'), 
+                "x": LaunchConfiguration('x'),
+                "y": LaunchConfiguration('y'),
                 "z": LaunchConfiguration('z'),
-                "roll": LaunchConfiguration('R'), 
-                "pitch": LaunchConfiguration('P'), 
+                "roll": LaunchConfiguration('R'),
+                "pitch": LaunchConfiguration('P'),
                 "yaw": LaunchConfiguration('Y'),
                 "world": LaunchConfiguration('world'),
-                "entity": LaunchConfiguration('entity'), 
+                "entity": LaunchConfiguration('entity'),
                 "ros_bridge": "true",
                 "simplified": LaunchConfiguration('simplified'),
                 "motor": LaunchConfiguration('motor')
             }.items(),
         )
-    
+
     # General bridge for tfs and joint state
     ld.add_action(
        Node(
@@ -265,11 +255,24 @@ def generate_launch_description():
            ),
     )
 
-    # Include spawn 
+    # Include spawn
     ld.add_action(spawn_include)
 
     # Load controllers by using opaque functions
-    ld.add_action(OpaqueFunction(function=load_controllers))
-    
+    controllers_loader = TimerAction(
+        period=10.0,
+        actions=[OpaqueFunction(function=load_controllers)]
+    )
+
+    ld.add_action(controllers_loader)
+
+    # Laser filter related to prevent considering self as obstacle
+    ld.add_action(Node(
+        package='orion_utils_py',
+        executable='laser_filter',
+        name='laser_filter',
+        output='screen'
+    ))
+
     # Return launch description
     return ld
