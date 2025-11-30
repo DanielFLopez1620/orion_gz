@@ -1,5 +1,7 @@
 # 🤖 ORION Gazebo Sim
 
+![welcome_to_gz](/orion_gz/resources/welcome_to_gz.gif)
+
 ## 🌟 Overview
 
 Package oriented to the usage of the simulator GZ Sim (Harmonic) with the ORION robot that allows the integration of plugins for sensor and actuators, it also provides the option to use **ros2_control** with **gz_ros2_control**
