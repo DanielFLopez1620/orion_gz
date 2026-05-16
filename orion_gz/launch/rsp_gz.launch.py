@@ -52,7 +52,6 @@ def generate_robot_description(context):
     Gazebo Harmonic.
     """
     # Paths to consider
-    pkg_gmov = get_package_share_directory('g_mov_description')
     pkg_description = get_package_share_directory('orion_description')
     pkg_sim_description = get_package_share_directory('orion_gz')
     xacro_file = os.path.join(pkg_sim_description, 'urdf', 'orion_gz.urdf.xacro')
@@ -69,14 +68,13 @@ def generate_robot_description(context):
         'motor': get_argument(context, "motor")
     }
 
-    # Obtaining robot description and making the substitution
+    # Obtaining robot description and making the substitution. The g_mov
+    # description was merged into orion_description, so meshes for the G Mov
+    # module live under orion_description/meshes too.
     robot_description_config = xacro.process_file(xacro_file, mappings=mappings)
     robot_desc = robot_description_config.toprettyxml(indent='  ')
     robot_desc = robot_desc.replace(
         'package://orion_description/', f'file://{pkg_description}/'
-    )
-    robot_desc = robot_desc.replace(
-        'package://g_mov_description/', f'file://{pkg_gmov}/'
     )
 
     # Launch node for robot state publisher

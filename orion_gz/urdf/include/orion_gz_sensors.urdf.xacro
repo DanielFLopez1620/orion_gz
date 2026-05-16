@@ -338,7 +338,7 @@
                     name="gz::sim::systems::Imu">
                 </plugin>
             </gazebo>
-            <gazebo reference="imu">
+            <gazebo reference="g_mov_imu">
                 <sensor name="imu_sensor" type="imu">
                     <always_on>1</always_on>
                     <update_rate>50</update_rate>
