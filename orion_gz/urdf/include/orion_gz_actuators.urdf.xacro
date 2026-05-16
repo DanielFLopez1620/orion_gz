@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:unless value="${ros2_control}">
+        <!-- ////////////////////// JOINT PLUGINS /////////////////////////// -->
+        <!-- ...................... Diff Drive Controller ............... -->
+        <gazebo>
+            <plugin
+                filename="gz-sim-diff-drive-system"
+                name="gz::sim::systems::DiffDrive">
+                <left_joint>coupling_11_joint</left_joint>
+                <right_joint>coupling_12_joint</right_joint>
+                <wheel_separation>0.18</wheel_separation>
+                <wheel_radius>${0.06772/2}</wheel_radius>
+                <odom_publish_frequency>1</odom_publish_frequency>
+                <max_linear_acceleration>1</max_linear_acceleration>
+                <min_linear_acceleration>-1</min_linear_acceleration>
+                <max_angular_acceleration>2</max_angular_acceleration>
+                <min_angular_acceleration>-2</min_angular_acceleration>
+                <max_linear_velocity>2.791666667</max_linear_velocity>
+                <min_linear_velocity>-2.791666667</min_linear_velocity>
+                <max_angular_velocity>2.791666667</max_angular_velocity>
+                <min_angular_velocity>-2.791666667</min_angular_velocity>
+                <odom_publish_frequency>30</odom_publish_frequency>
+                <frame_id>odom</frame_id>
+                <child_frame_id>base_link</child_frame_id>
+            </plugin>
+        </gazebo>
+
+        <!-- .................... Servo controllers ................ -->
+        <xacro:if value="${servo}">
+            <gazebo>
+                <plugin
+                    filename="gz-sim-joint-position-controller-system"
+                    name="gz::sim::systems::JointPositionController">
+                    <joint_name>servo_conn1_joint</joint_name>
+                    <p_gain>10</p_gain>
+                    <i_gain>0.1</i_gain>
+                    <d_gain>0.01</d_gain>
+                    <i_max>1</i_max>
+                    <i_min>-1</i_min>
+                    <cmd_max>1000</cmd_max>
+                    <cmd_min>-1000</cmd_min>
+                </plugin>
+            </gazebo>
+
+            <gazebo>
+                <plugin
+                    filename="gz-sim-joint-position-controller-system"
+                    name="gz::sim::systems::JointPositionController">
+                    <joint_name>servo_conn2_joint</joint_name>
+                    <p_gain>10</p_gain>
+                    <i_gain>0.1</i_gain>
+                    <d_gain>0.01</d_gain>
+                    <i_max>1</i_max>
+                    <i_min>-1</i_min>
+                    <cmd_max>1000</cmd_max>
+                    <cmd_min>-1000</cmd_min>
+                </plugin>
+            </gazebo>
+        </xacro:if>
+
+        <xacro:if value="${camera == 'a010' and g_mov}">
+            <gazebo>
+                <plugin
+                    filename="gz-sim-joint-position-controller-system"
+                    name="gz::sim::systems::JointPositionController">
+                    <joint_name>g_mov_servo_conn_joint</joint_name>
+                    <p_gain>10</p_gain>
+                    <i_gain>0.1</i_gain>
+                    <d_gain>0.01</d_gain>
+                    <i_max>1</i_max>
+                    <i_min>-1</i_min>
+                    <cmd_max>1000</cmd_max>
+                    <cmd_min>-1000</cmd_min>
+                </plugin>
+            </gazebo>
+        </xacro:if>
+
+            <!-- ...................... Joint state publisher ................ -->
+        <gazebo>
+            <plugin filename="gz-sim-joint-state-publisher-system" 
+                name="gz::sim::systems::JointStatePublisher">
+                <joint_name>coupling_11_joint</joint_name>
+                <joint_name>coupling_12_joint</joint_name>
+                <joint_name>caster_middle_2_joint</joint_name>
+                <joint_name>caster_wheel_2_joint</joint_name>
+            <xacro:if value="${servo}">
+                <joint_name>servo_conn1_joint</joint_name>
+                <joint_name>servo_conn2_joint</joint_name>
+            </xacro:if>
+            <xacro:if value="${camera == 'a010' and g_mov}">
+                <joint_name>g_mov_servo_conn_joint</joint_name>
+            </xacro:if>
+            </plugin>
+        </gazebo>
+
+        <gazebo>
+            <plugin filename="gz-sim-joint-state-publisher-system" 
+                name="gz::sim::systems::JointStatePublisher">
+                <joint_name>caster_middle_2_joint</joint_name>
+                <joint_name>caster_wheel_2_joint</joint_name>
+            </plugin>
+        </gazebo>
+    </xacro:unless>
+
+    <xacro:if value="${ros2_control}">
+         <ros2_control name="GazeboSystem" type="system">
+            <hardware>
+                <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+            </hardware>
+            <joint name="coupling_11_joint">
+                <command_interface name="velocity">
+                    <param name="min">-2.791666667</param>
+                    <param name="max">2.791666667</param>
+                </command_interface>
+                <state_interface name="velocity"/>
+                <state_interface name="position"/>
+            </joint>
+            <joint name="coupling_12_joint">
+                <command_interface name="velocity">
+                    <param name="min">-2.791666667</param>
+                    <param name="max">2.791666667</param>
+                </command_interface>
+                <state_interface name="velocity"/>
+                <state_interface name="position"/>
+            </joint>
+        <xacro:if value="${servo}">
+            <joint name="servo_conn1_joint">
+                <command_interface name="position" />
+                <command_interface name="velocity" />
+                <state_interface name="position" />
+                <state_interface name="velocity" />
+            </joint>
+            <joint name="servo_conn2_joint">
+                <command_interface name="position" />
+                <command_interface name="velocity" />
+                <state_interface name="position" />
+                <state_interface name="velocity" />
+            </joint>
+        </xacro:if>
+        <xacro:if value="${camera == 'a010' and g_mov}">
+            <joint name="g_mov_servo_conn_joint">
+                <command_interface name="position" />
+                <command_interface name="velocity" />
+                <state_interface name="position" />
+                <state_interface name="velocity" />
+            </joint>
+        </xacro:if>
+            <joint name="caster_middle_2_joint">
+                <state_interface name="position"/>
+                <state_interface name="velocity"/>
+            </joint>
+
+            <joint name="caster_wheel_2_joint">
+                <state_interface name="position"/>
+                <state_interface name="velocity"/>
+            </joint>
+        </ros2_control>
+
+        <gazebo>
+            <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+                <parameters>$(find orion_control)/config/gz_ros_control.yaml</parameters>
+            </plugin>
+        </gazebo>
+
+    </xacro:if>
+</robot>

@@ -1,0 +1,422 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- ////////////////////// PROPERTIES ////////////////////////////// -->
+    <xacro:property name="noise_and_dist" value="true"/>
+    
+    <!-- ////////////////////// GENERAL PLUGINS ///////////////////////// -->
+    <!-- ...................... Required for sensors systems ............ -->
+    <gazebo>
+        <plugin
+			filename="gz-sim-sensors-system"
+			name="gz::sim::systems::Sensors">
+			<render_engine>ogre2</render_engine>
+        </plugin>
+    </gazebo>
+
+    <!-- ////////////////////// SENSOR PLUGINS ///////////////////////// -->
+    <!-- .......................... LIDARs ............................. -->
+    <gazebo reference="laser_scan">
+		<sensor name='gpu_lidar' type='gpu_lidar'>
+            <update_rate>10</update_rate>
+            <gz_frame_id>laser_scan</gz_frame_id>
+            <!-- Info based on: -->
+            <!-- https://www.ldrobot.com/images/2023/05/23/LDROBOT_LD19_Datasheet_EN_v2.6_Q1JXIRVq.pdf -->
+            <ray>
+                <scan>
+                <horizontal>
+                    <samples>720</samples>
+                    <resolution>1</resolution>
+                    <min_angle>0</min_angle>
+                    <max_angle>${2*pi}</max_angle>
+                </horizontal>
+                <vertical>
+                    <samples>1</samples>
+                    <resolution>0.01</resolution>
+                    <min_angle>0</min_angle>
+                    <max_angle>0</max_angle>
+                </vertical>
+                </scan>
+                <range>
+                    <min>0.03</min>
+                    <max>12.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+                <!-- Noise addition -->
+                <noise>
+                    <type>gaussian</type>
+                    <mean>0.0</mean>
+                    <stddev>0.01</stddev>
+                </noise>
+            </ray>
+            <always_on>1</always_on>
+            <visualize>true</visualize>
+        </sensor>
+    </gazebo>
+
+    <!-- .......................... Cameras ................................ -->
+    <xacro:if value="${camera== 'astra_s'}">
+        <gazebo reference="camera_link">
+            <sensor name="camera" type="rgbd_camera">
+                <!-- Data based on https://store.orbbec.com/products/astra-s -->
+                <camera>
+                    <horizontal_fov>1.1013</horizontal_fov>
+                    <image>
+                        <format>R8G8B8</format>
+                        <width>640</width>
+                        <height>480</height>
+                    </image>
+                    <clip>
+                        <near>0.4</near>
+                        <far>2</far>
+                    </clip>
+                    <xacro:if value="${noise_and_dist}">
+                        <!-- Noise addition -->
+                        <noise>
+                            <type>gaussian</type>
+                            <mean>0.003</mean>
+                            <stddev>0.01</stddev>
+                        </noise>
+                        <!-- Distorsion addition -->
+                        <distortion>
+                            <k1>0.02</k1>
+                            <k2>0.02</k2>
+                            <k3>0.01</k3>
+                            <p1>0.01</p1>
+                            <p2>0.01</p2>
+                            <center>0.5 0.5</center>
+                        </distortion>
+                    </xacro:if>
+                    <gz_frame_id>camera_link</gz_frame_id>
+                    <optical_frame_id>camera_link_optical</optical_frame_id>
+                </camera>
+                <always_on>1</always_on>
+                <update_rate>30</update_rate>
+                <visualize>true</visualize>
+            </sensor>
+            <sensor name="camera_aux" type="depth_camera">
+                <!-- Data based on https://store.orbbec.com/products/astra-s -->
+                <camera>
+                    <horizontal_fov>1.1013</horizontal_fov>
+                    <image>
+                        <format>R8G8B8</format>
+                        <width>640</width>
+                        <height>480</height>
+                    </image>
+                    <clip>
+                        <near>0.4</near>
+                        <far>2</far>
+                    </clip>
+                    <xacro:if value="${noise_and_dist}">
+                        <!-- Noise addition -->
+                        <noise>
+                            <type>gaussian</type>
+                            <mean>0.003</mean>
+                            <stddev>0.01</stddev>
+                        </noise>
+                        <!-- Distorsion addition -->
+                        <distortion>
+                            <k1>0.02</k1>
+                            <k2>0.02</k2>
+                            <k3>0.01</k3>
+                            <p1>0.01</p1>
+                            <p2>0.01</p2>
+                            <center>0.5 0.5</center>
+                        </distortion>
+                    </xacro:if>
+                    <optical_frame_id>camera_link</optical_frame_id>
+                </camera>
+                <always_on>1</always_on>
+                <update_rate>30</update_rate>
+                <visualize>true</visualize>
+            </sensor>
+        </gazebo>
+    </xacro:if>
+
+    <xacro:if value="${camera== 'os30a'}">
+        <gazebo reference="camera_link">
+            <sensor name="camera" type="rgbd_camera">
+                <!-- Data based on : -->
+                <!-- https://www.ydlidar.com/Public/upload/files/2022-11-30/BMVM-OS30A%20Data%20Sheet%20V1.0%20(221130).pdf -->
+                <camera>
+                    <horizontal_fov>1.263618</horizontal_fov>
+                    <image>
+                        <format>R8G8B8</format>
+                        <width>1080</width>
+                        <height>920</height>
+                    </image>
+                    <clip>
+                        <near>0.2</near>
+                        <far>2.5</far>
+                    </clip>
+                    <xacro:if value="${noise_and_dist}">
+                        <!-- Noise addition -->
+                        <noise>
+                            <type>gaussian</type>
+                            <mean>0.0</mean>
+                            <stddev>0.015</stddev>
+                        </noise>
+                        <!-- Distorsion addition -->
+                        <distortion>
+                            <k1>-0.1</k1>
+                            <k2>0.02</k2>
+                            <k3>0.01</k3>
+                            <p1>0.0</p1>
+                            <p2>0.0</p2>
+                            <center>0.5 0.5</center>
+                        </distortion>
+                    </xacro:if>
+                    <gz_frame_id>camera_link</gz_frame_id>
+                    <optical_frame_id>camera_link_optical</optical_frame_id>
+                </camera>
+                <always_on>1</always_on>
+                <update_rate>30</update_rate>
+                <visualize>true</visualize>
+            </sensor>
+            <sensor name="camera_aux" type="depth_camera">
+                <!-- Data based on : -->
+                <!-- https://www.ydlidar.com/Public/upload/files/2022-11-30/BMVM-OS30A%20Data%20Sheet%20V1.0%20(221130).pdf -->
+                <camera>
+                    <horizontal_fov>1.263618</horizontal_fov>
+                    <image>
+                        <format>R8G8B8</format>
+                        <width>1080</width>
+                        <height>920</height>
+                    </image>
+                    <clip>
+                        <near>0.2</near>
+                        <far>2.5</far>
+                    </clip>
+                    <xacro:if value="${noise_and_dist}">
+                        <!-- Noise addition -->
+                        <noise>
+                            <type>gaussian</type>
+                            <mean>0.0</mean>
+                            <stddev>0.015</stddev>
+                        </noise>
+                        <!-- Distorsion addition -->
+                        <distortion>
+                            <k1>-0.1</k1>
+                            <k2>0.02</k2>
+                            <k3>0.01</k3>
+                            <p1>0.0</p1>
+                            <p2>0.0</p2>
+                            <center>0.5 0.5</center>
+                        </distortion>
+                    </xacro:if>
+                    <optical_frame_id>camera_link</optical_frame_id>
+                </camera>
+                <always_on>1</always_on>
+                <update_rate>30</update_rate>
+                <visualize>true</visualize>
+            </sensor>
+        </gazebo>
+    </xacro:if>
+
+    <xacro:if value="${camera== 'a010'}">
+        <gazebo reference="camera_link">
+            <sensor name="camera" type="depth_camera">
+                <!-- Data based on: -->
+                <!-- https://pdf.direnc.net/upload/1-14-inc-lcd-ekranli-3d-tof-derinlik-sensoru-kamera-datasheet.pdf -->
+                <camera>
+                    <horizontal_fov>1.22</horizontal_fov>
+                    <image>
+                        <format>R8G8B8</format>
+                        <width>100</width>
+                        <height>100</height>
+                    </image>
+                    <clip>
+                        <near>0.15</near>
+                        <far>1.5</far>
+                    </clip>
+                    <xacro:if value="${noise_and_dist}">
+                        <!-- Noise addition -->
+                        <noise>
+                            <type>gaussian</type>
+                            <mean>0.0</mean>
+                            <stddev>0.01</stddev>
+                        </noise>
+                        <!-- Distorsion addition -->
+                        <distortion>
+                            <k1>-0.025</k1>
+                            <k2>0.005</k2>
+                            <k3>0.002</k3>
+                            <p1>0.0</p1>
+                            <p2>0.0</p2>
+                            <center>0.5 0.5</center>
+                        </distortion>
+                    </xacro:if>
+                    <gz_frame_id>camera_link</gz_frame_id>
+                    <optical_frame_id>camera_link_optical</optical_frame_id>
+                </camera>
+                <always_on>1</always_on>
+                <update_rate>20</update_rate>
+                <visualize>true</visualize>
+            </sensor>
+            <sensor name="camera_aux" type="depth_camera">
+                <!-- Data based on: -->
+                <!-- https://pdf.direnc.net/upload/1-14-inc-lcd-ekranli-3d-tof-derinlik-sensoru-kamera-datasheet.pdf -->
+                <camera>
+                    <horizontal_fov>1.22</horizontal_fov>
+                    <image>
+                        <format>R8G8B8</format>
+                        <width>100</width>
+                        <height>100</height>
+                    </image>
+                    <clip>
+                        <near>0.15</near>
+                        <far>1.5</far>
+                    </clip>
+                    <xacro:if value="${noise_and_dist}">
+                        <!-- Noise addition -->
+                        <noise>
+                            <type>gaussian</type>
+                            <mean>0.0</mean>
+                            <stddev>0.01</stddev>
+                        </noise>
+                        <!-- Distorsion addition -->
+                        <distortion>
+                            <k1>-0.025</k1>
+                            <k2>0.005</k2>
+                            <k3>0.002</k3>
+                            <p1>0.0</p1>
+                            <p2>0.0</p2>
+                            <center>0.5 0.5</center>
+                        </distortion>
+                    </xacro:if>
+                    <optical_frame_id>camera_link</optical_frame_id>
+                </camera>
+                <always_on>1</always_on>
+                <update_rate>20</update_rate>
+                <visualize>true</visualize>
+            </sensor>
+        </gazebo>
+
+        <gazebo reference="g_mov_cam_link">
+            <sensor name="camera_g" type="camera">
+                <!-- Data based on : -->
+                <!-- https://static.chipdip.ru/lib/664/DOC001664108.pdf -->
+                <camera>
+                    <horizontal_fov>1.361357</horizontal_fov>
+                    <image>
+                    <width>1080</width>
+                    <height>810</height>
+                    </image>
+                    <clip>
+                        <near>0.2</near>
+                        <far>10.0</far>
+                    </clip>
+                    <xacro:if value="true">
+                        <!-- Noise addition -->
+                        <noise>
+                            <type>gaussian</type>
+                            <mean>0.0</mean>
+                            <stddev>0.015</stddev>
+                        </noise>
+                        <!-- Distorsion addition -->
+                        <distortion>
+                            <k1>-0.1</k1>
+                            <k2>0.02</k2>
+                            <k3>0.01</k3>
+                            <p1>0.0</p1>
+                            <p2>0.0</p2>
+                            <center>0.5 0.5</center>
+                        </distortion>
+                    </xacro:if>
+                    <gz_frame_id>g_mov_cam_link</gz_frame_id>
+                    <optical_frame_id>g_mov_cam_link_optical</optical_frame_id>
+                </camera>
+                <always_on>1</always_on>
+                <update_rate>30</update_rate>
+                <visualize>true</visualize>
+            </sensor>
+        </gazebo>
+        <xacro:if value="${g_mov}">
+            <gazebo>
+                <plugin
+                    filename="gz-sim-imu-system"
+                    name="gz::sim::systems::Imu">
+                </plugin>
+            </gazebo>
+            <gazebo reference="imu">
+                <sensor name="imu_sensor" type="imu">
+                    <always_on>1</always_on>
+                    <update_rate>50</update_rate>
+                    <imu>
+                    <enable_orientation>true</enable_orientation>
+                    <angular_velocity>
+                        <x>
+                        <noise type="gaussian">
+                            <mean>0</mean>
+                            <stddev>0.009</stddev>
+                            <bias_mean>0.00075</bias_mean>
+                            <bias_stddev>0.005</bias_stddev>
+                            <dynamic_bias_stddev>0.00002</dynamic_bias_stddev>
+                            <dynamic_bias_correlation_time>400.0</dynamic_bias_correlation_time>
+                            <precision>0.00025</precision>
+                        </noise>
+                        </x>
+                        <y>
+                        <noise type="gaussian">
+                            <mean>0</mean>
+                            <stddev>0.009</stddev>
+                            <bias_mean>0.00075</bias_mean>
+                            <bias_stddev>0.005</bias_stddev>
+                            <dynamic_bias_stddev>0.00002</dynamic_bias_stddev>
+                            <dynamic_bias_correlation_time>400.0</dynamic_bias_correlation_time>
+                            <precision>0.00025</precision>
+                        </noise>
+                        </y>
+                        <z>
+                        <noise type="gaussian">
+                            <mean>0</mean>
+                            <stddev>0.009</stddev>
+                            <bias_mean>0.00075</bias_mean>
+                            <bias_stddev>0.005</bias_stddev>
+                            <dynamic_bias_stddev>0.00002</dynamic_bias_stddev>
+                            <dynamic_bias_correlation_time>400.0</dynamic_bias_correlation_time>
+                            <precision>0.00025</precision>
+                        </noise>
+                        </z>
+                    </angular_velocity>
+                    <linear_acceleration>
+                        <x>
+                        <noise type="gaussian">
+                            <mean>0</mean>
+                            <stddev>0.021</stddev>
+                            <bias_mean>0.05</bias_mean>
+                            <bias_stddev>0.0075</bias_stddev>
+                            <dynamic_bias_stddev>0.000375</dynamic_bias_stddev>
+                            <dynamic_bias_correlation_time>175.0</dynamic_bias_correlation_time>
+                            <precision>0.005</precision>
+                        </noise>
+                        </x>
+                        <y>
+                        <noise type="gaussian">
+                            <mean>0</mean>
+                            <stddev>0.021</stddev>
+                            <bias_mean>0.05</bias_mean>
+                            <bias_stddev>0.0075</bias_stddev>
+                            <dynamic_bias_stddev>0.000375</dynamic_bias_stddev>
+                            <dynamic_bias_correlation_time>175.0</dynamic_bias_correlation_time>
+                            <precision>0.005</precision>
+                        </noise>
+                        </y>
+                        <z>
+                        <noise type="gaussian">
+                            <mean>0</mean>
+                            <stddev>0.021</stddev>
+                            <bias_mean>0.05</bias_mean>
+                            <bias_stddev>0.0075</bias_stddev>
+                            <dynamic_bias_stddev>0.000375</dynamic_bias_stddev>
+                            <dynamic_bias_correlation_time>175.0</dynamic_bias_correlation_time>
+                            <precision>0.005</precision>
+                        </noise>
+                        </z>
+                    </linear_acceleration>
+                    </imu>
+                </sensor>
+            </gazebo>
+        </xacro:if>
+    </xacro:if>
+</robot>

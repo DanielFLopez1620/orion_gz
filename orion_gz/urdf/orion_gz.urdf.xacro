@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="orion">
+
+    <xacro:property name="camera" default="$(arg camera)"/>
+    <xacro:property name="servo" default="$(arg servo)"/>
+    <xacro:property name="g_mov" default="$(arg g_mov)"/>
+    <xacro:property name="rasp" default="$(arg rasp)"/>
+    <xacro:property name="gazebo" default="$(arg gazebo)"/>
+    <xacro:property name="ros2_control" default="$(arg ros2_control)"/>
+    <xacro:property name="simplified" default="true"/>
+    <xacro:property name="motor" value="100"/>
+
+    <!-- For colors consider mdf, transparent or pla -->
+    <xacro:property name="color" default="pla"/>
+
+    <!-- Include other files -->
+    <xacro:include filename="$(find orion_description)/urdf/include/orion_materials.urdf.xacro"/>
+    <xacro:include filename="$(find orion_description)/urdf/include/orion_macros.urdf.xacro"/>
+    <xacro:include filename="$(find orion_description)/urdf/include/orion_base.urdf.xacro"/>
+    <xacro:include filename="$(find orion_description)/urdf/include/orion_arms.urdf.xacro"/>
+    <xacro:include filename="$(find orion_description)/urdf/include/orion_cameras.urdf.xacro"/>
+
+    <xacro:if value="${gazebo}">
+        <xacro:include filename="$(find orion_gz)/urdf/include/orion_gz_sensors.urdf.xacro"/>
+        <xacro:include filename="$(find orion_gz)/urdf/include/orion_gz_actuators.urdf.xacro"/>
+    </xacro:if>
+
+</robot>

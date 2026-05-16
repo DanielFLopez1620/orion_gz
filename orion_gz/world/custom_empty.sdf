@@ -1,0 +1,290 @@
+<?xml version="1.0" ?>
+
+<sdf version="1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://sdformat.org/schemas/root.xsd">
+    <world name="custom_empty">
+        <!-- /////////////////// GLOBAL CONFIGURATIONS ///////////////////// -->
+        <!-- ..................... Physics set up .......................... -->
+        <physics name="1ms" type="ignored">
+            <max_step_size>0.001</max_step_size>
+            <real_time_factor>1</real_time_factor>
+            <real_time_update_rate>100</real_time_update_rate>
+        </physics>
+        <plugin
+            filename="gz-sim-physics-system"
+            name="gz::sim::systems::Physics">
+        </plugin>
+
+        <!-- ..................... Scene Set Up ............................. -->
+        <plugin
+            filename="gz-sim-user-commands-system"
+            name="gz::sim::systems::UserCommands">
+        </plugin>
+        <plugin
+            filename="gz-sim-scene-broadcaster-system"
+            name="gz::sim::systems::SceneBroadcaster">
+        </plugin>
+
+        <!-- /////////////////// GUI CONSIDERATIONS ///////////////////// -->
+        <gui fullscreen="0">
+            <!-- ..................... 3D Scene .......................... -->
+            <plugin filename="GzScene3D" name="3D View">
+                <gz-gui>
+                <title>3D View</title>
+                <property type="bool" key="showTitleBar">false</property>
+                <property type="string" key="state">docked</property>
+                </gz-gui>
+                <engine>ogre2</engine>
+                <scene>scene</scene>
+                <ambient_light>0.4 0.4 0.4</ambient_light>
+                <background_color>0.8 0.8 0.8</background_color>
+                <camera_pose>-0.7 0.7 0.7 0 0.3 -0.3</camera_pose>
+            </plugin>
+
+            <!-- ..................... Entity Menu ........................ -->
+            <plugin filename="EntityContextMenuPlugin" name="Entity context menu">
+              <gz-gui>
+                <property key="state" type="string">floating</property>
+                <property key="width" type="double">5</property>
+                <property key="height" type="double">5</property>
+                <property key="showTitleBar" type="bool">false</property>
+              </gz-gui>
+            </plugin>
+
+            <!-- ..................... Interaction ....................... -->
+            <plugin filename="InteractiveViewControl" 
+                name="Interactive view control">
+              <gz-gui>
+                <property key="resizable" type="bool">false</property>
+                <property key="width" type="double">5</property>
+                <property key="height" type="double">5</property>
+                <property key="state" type="string">floating</property>
+                <property key="showTitleBar" type="bool">false</property>
+              </gz-gui>
+            </plugin>
+
+            <!-- ..................... Camera SetUp........................ -->
+            <plugin filename="CameraTracking" name="Camera Tracking">
+              <gz-gui>
+                <property key="resizable" type="bool">false</property>
+                <property key="width" type="double">5</property>
+                <property key="height" type="double">5</property>
+                <property key="state" type="string">floating</property>
+                <property key="showTitleBar" type="bool">false</property>
+              </gz-gui>
+            </plugin>
+
+            <!-- .................. Play / pause / step .................... -->
+            <plugin filename="WorldControl" name="WorldControl">
+                <gz-gui>
+                <title>World control</title>
+                <property type="bool" key="showTitleBar">false</property>
+                <property type="bool" key="resizable">false</property>
+                <property type="double" key="height">72</property>
+                <property type="double" key="width">121</property>
+                <property type="double" key="z">1</property>
+                <property type="string" key="state">floating</property>
+                <anchors target="3D View">
+                    <line own="left" target="left"/>
+                    <line own="bottom" target="bottom"/>
+                </anchors>
+                </gz-gui>
+                <play_pause>true</play_pause>
+                <step>true</step>
+                <start_paused>true</start_paused>
+            </plugin>
+
+            <!-- ............. Statistics about Time and RTF ............... -->
+            <plugin filename="WorldStats" name="WorldStats">
+                <gz-gui>
+                <title>World stats</title>
+                <property type="bool" key="showTitleBar">false</property>
+                <property type="bool" key="resizable">false</property>
+                <property type="double" key="height">110</property>
+                <property type="double" key="width">290</property>
+                <property type="double" key="z">1</property>
+                <property type="string" key="state">floating</property>
+                <anchors target="3D View">
+                    <line own="right" target="right"/>
+                    <line own="bottom" target="bottom"/>
+                </anchors>
+                </gz-gui>
+                <sim_time>true</sim_time>
+                <real_time>true</real_time>
+                <real_time_factor>true</real_time_factor>
+                <iterations>true</iterations>
+            </plugin>
+
+            <!-- ................... Shapes Toolbox ........................ -->
+            <plugin filename="Shapes" name="Shapes">
+                <gz-gui>
+                <property key="resizable" type="bool">false</property>
+                <property key="x" type="double">0</property>
+                <property key="y" type="double">0</property>
+                <property key="width" type="double">250</property>
+                <property key="height" type="double">50</property>
+                <property key="state" type="string">floating</property>
+                <property key="showTitleBar" type="bool">false</property>
+                <property key="cardBackground" type="string">#666666</property>
+                </gz-gui>
+            </plugin>
+
+            <!-- ................... Lights ............................... -->
+            <plugin filename="Lights" name="Lights">
+                <gz-gui>
+                <property key="resizable" type="bool">false</property>
+                <property key="x" type="double">250</property>
+                <property key="y" type="double">0</property>
+                <property key="width" type="double">150</property>
+                <property key="height" type="double">50</property>
+                <property key="state" type="string">floating</property>
+                <property key="showTitleBar" type="bool">false</property>
+                <property key="cardBackground" type="string">#666666</property>
+                </gz-gui>
+            </plugin>
+
+            <!-- ................ Translation / Rotation .................. -->
+            <plugin filename="TransformControl" name="TransformControl">
+                <gz-gui>
+                <property key="resizable" type="bool">false</property>
+                <property key="x" type="double">0</property>
+                <property key="y" type="double">50</property>
+                <property key="width" type="double">250</property>
+                <property key="height" type="double">50</property>
+                <property key="state" type="string">floating</property>
+                <property key="showTitleBar" type="bool">false</property>
+                <property key="cardBackground" type="string">#777777</property>
+                </gz-gui>
+            </plugin>
+
+            <!-- ................ Tool for Screenshots ..................... -->
+            <plugin filename="Screenshot" name="Screenshot">
+                <gz-gui>
+                <property key="resizable" type="bool">false</property>
+                <property key="x" type="double">250</property>
+                <property key="y" type="double">50</property>
+                <property key="width" type="double">50</property>
+                <property key="height" type="double">50</property>
+                <property key="state" type="string">floating</property>
+                <property key="showTitleBar" type="bool">false</property>
+                <property key="cardBackground" type="string">#777777</property>
+                </gz-gui>
+            </plugin>
+
+            <!-- .................... Entity tree .......................... -->
+            <plugin filename="EntityTree" name="Entity tree">
+                <gz-gui>
+                <property type="string" key="state">docked_collapsed</property>
+                </gz-gui>
+            </plugin>
+
+            <!-- ................... GZ Inspector .......................... -->
+            <plugin filename="ComponentInspector" name="Component inspector">
+                <gz-gui>
+                <property type="string" key="state">docked_collapsed</property>
+                </gz-gui>
+            </plugin>
+
+            <!-- .................... Camera visualization ................. -->
+            <plugin filename="ImageDisplay" name="Image Display 2">
+                <gz-gui>
+                <title>Depth camera</title>
+                    <property key="state" type="string">floating</property>
+                    <property type="double" key="width">350</property>
+                    <property type="double" key="height">315</property>
+                    <property type="double" key="x">1070</property>
+                </gz-gui>
+                <topic>/world/custom_empty/model/orion/link/base_link/sensor/camera/depth_image</topic>
+                <topic_picker>true</topic_picker>
+            </plugin>
+            <plugin filename="ImageDisplay" name="Image Display 3">
+                <gz-gui>
+                    <title>Camera Image</title>
+                    <property key="state" type="string">floating</property>
+                    <property type="double" key="width">350</property>
+                    <property type="double" key="height">315</property>
+                    <property type="double" key="y">320</property>
+                    <property type="double" key="x">1070</property>
+                    </gz-gui>
+                <topic>/world/custom_empty/model/orion/link/base_link/sensor/camera/image</topic>
+                <topic_picker>true</topic_picker>
+            </plugin>
+
+            <!-- ...................... Visualize Lidar .................. -->
+            <plugin filename="VisualizeLidar" name="Visualize Lidar">
+                <gz-gui>
+                    <property type="string" key="state">docked_collapsed</property>
+                </gz-gui>
+            </plugin>
+
+            <!-- ...................... GUI for controlling joints ........ -->
+            <plugin filename="JointPositionController" name="Joint Position Controller">
+                <gz-gui>
+                    <property type="string" key="state">docked_collapsed</property>
+                </gz-gui>
+            </plugin>
+            <!-- .................... Teleoperation with cmd_vel ......... -->
+            <plugin filename="Teleop" name="Teleop">
+                <gz-gui>
+                    <property type="string" key="state">docked</property>
+                </gz-gui>
+                <topic>/model/orion/cmd_vel</topic>
+            </plugin>
+        </gui>
+
+        <!-- //////////////////////// Scene configuration //////////////// -->
+        <!-- ....................... Ambient SetUp ....................... -->
+        <scene>
+            <ambient>1 1 1 1</ambient>
+            <background>0.3 0.7 0.9 1</background>
+            <shadows>1</shadows>
+            <grid>true</grid>
+        </scene>
+
+        <!-- ..................... Adding ambient light ................... -->
+        <light type="directional" name="sun">
+            <cast_shadows>true</cast_shadows>
+            <pose>0 0 10 0 0 0</pose>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+            <attenuation>
+                <range>1000</range>
+                <constant>0.9</constant>
+                <linear>0.01</linear>
+                <quadratic>0.001</quadratic>
+            </attenuation>
+            <direction>-0.5 0.1 -0.9</direction>
+        </light>
+
+        <!-- .................... Adding ground plane ...................... -->
+        <model name="ground_plane">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                <geometry>
+                    <plane>
+                    <normal>0 0 1</normal>
+                    <size>100 100</size>
+                    </plane>
+                </geometry>
+                </collision>
+                <visual name="visual">
+                <geometry>
+                    <plane>
+                    <normal>0 0 1</normal>
+                    <size>100 100</size>
+                    </plane>
+                </geometry>
+                <material>
+                    <ambient>0.8 0.8 0.8 1</ambient>
+                    <diffuse>0.8 0.8 0.8 1</diffuse>
+                    <specular>0.8 0.8 0.8 1</specular>
+                </material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- .............. Adding elements to the world ................... -->
+        <!-- Well... this is an empty world, for now, nothing more -->
+    </world>
+</sdf>
