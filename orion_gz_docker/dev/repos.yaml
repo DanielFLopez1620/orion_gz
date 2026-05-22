@@ -1,0 +1,7 @@
+repositories:
+  # orion_gz is NOT listed here — it is bind-mounted live by devcontainer.
+
+  orion_common:
+    type: git
+    url: https://github.com/Tesis-ORION/orion_common.git
+    version: main
