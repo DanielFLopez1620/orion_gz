@@ -1,0 +1,6 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource prefix="/libTouchSensorPlugin.so">
+    <file alias="libTouchSensorPlugin.so.qml">TouchSensorPlugin.qml</file>
+  </qresource>
+</RCC>

@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<!--
+  touch_sensor_default.sdf
+  Minimal reusable sensor zone for ORION touch inputs.
+  Include this snippet (or copy the link/joint block) into orion_demo.sdf
+  or the real ORION model SDF.
+
+  Each sensor is a thin flat box (30 × 30 × 4 mm) with a semi-transparent
+  material so it is visible in the viewport but does not obstruct the view
+  of the robot. The visual name must match the name configured in
+  TouchSensorPlugin (default: touch_ul, touch_ur, touch_ll, touch_lr).
+-->
+<sdf version="1.9">
+  <model name="touch_sensor_demo">
+    <static>true</static>
+
+    <link name="base">
+      <visual name="base_visual">
+        <geometry><box><size>0.2 0.2 0.01</size></box></geometry>
+        <material>
+          <ambient>0.5 0.5 0.5 1</ambient>
+          <diffuse>0.5 0.5 0.5 1</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <!-- Upper-left sensor -->
+    <link name="touch_ul">
+      <pose>-0.05 0.05 0.01 0 0 0</pose>
+      <visual name="touch_ul">
+        <geometry><box><size>0.03 0.03 0.004</size></box></geometry>
+        <material>
+          <ambient>0.2 0.6 1.0 0.6</ambient>
+          <diffuse>0.2 0.6 1.0 0.6</diffuse>
+          <emissive>0 0.1 0.2 1</emissive>
+        </material>
+      </visual>
+      <collision name="touch_ul_col">
+        <geometry><box><size>0.03 0.03 0.004</size></box></geometry>
+      </collision>
+    </link>
+    <joint name="touch_ul_joint" type="fixed">
+      <parent>base</parent><child>touch_ul</child>
+    </joint>
+
+    <!-- Upper-right sensor -->
+    <link name="touch_ur">
+      <pose>0.05 0.05 0.01 0 0 0</pose>
+      <visual name="touch_ur">
+        <geometry><box><size>0.03 0.03 0.004</size></box></geometry>
+        <material>
+          <ambient>0.2 0.6 1.0 0.6</ambient>
+          <diffuse>0.2 0.6 1.0 0.6</diffuse>
+          <emissive>0 0.1 0.2 1</emissive>
+        </material>
+      </visual>
+      <collision name="touch_ur_col">
+        <geometry><box><size>0.03 0.03 0.004</size></box></geometry>
+      </collision>
+    </link>
+    <joint name="touch_ur_joint" type="fixed">
+      <parent>base</parent><child>touch_ur</child>
+    </joint>
+
+    <!-- Lower-left sensor -->
+    <link name="touch_ll">
+      <pose>-0.05 -0.05 0.01 0 0 0</pose>
+      <visual name="touch_ll">
+        <geometry><box><size>0.03 0.03 0.004</size></box></geometry>
+        <material>
+          <ambient>0.2 0.6 1.0 0.6</ambient>
+          <diffuse>0.2 0.6 1.0 0.6</diffuse>
+          <emissive>0 0.1 0.2 1</emissive>
+        </material>
+      </visual>
+      <collision name="touch_ll_col">
+        <geometry><box><size>0.03 0.03 0.004</size></box></geometry>
+      </collision>
+    </link>
+    <joint name="touch_ll_joint" type="fixed">
+      <parent>base</parent><child>touch_ll</child>
+    </joint>
+
+    <!-- Lower-right sensor -->
+    <link name="touch_lr">
+      <pose>0.05 -0.05 0.01 0 0 0</pose>
+      <visual name="touch_lr">
+        <geometry><box><size>0.03 0.03 0.004</size></box></geometry>
+        <material>
+          <ambient>0.2 0.6 1.0 0.6</ambient>
+          <diffuse>0.2 0.6 1.0 0.6</diffuse>
+          <emissive>0 0.1 0.2 1</emissive>
+        </material>
+      </visual>
+      <collision name="touch_lr_col">
+        <geometry><box><size>0.03 0.03 0.004</size></box></geometry>
+      </collision>
+    </link>
+    <joint name="touch_lr_joint" type="fixed">
+      <parent>base</parent><child>touch_lr</child>
+    </joint>
+
+  </model>
+</sdf>
