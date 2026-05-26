@@ -1,0 +1,507 @@
+<?xml version="1.0" ?>
+
+<!--
+  mapping_maze.sdf
+  A maze-style world designed for 2D-LIDAR SLAM mapping with the ORION robot
+  (box footprint ~0.33 x 0.23 x 0.38 m).
+
+  Layout (top view, 10 x 10 m, origin at center):
+  - Outer perimeter walls
+  - 4 x 4 m central island with a 1 m gap on the east side
+  - Four internal dividers that force 1 m-wide corridor crossings
+  - Two dead-end alcoves (NW and SE) for mapping richness
+  - All corridors >= 1.0 m wide; wall height 0.8 m (visible to 2D LIDAR)
+  - One closed loop around the island ensures loop-closure opportunities
+-->
+
+<sdf version="1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://sdformat.org/schemas/root.xsd">
+    <world name="mapping_maze">
+
+        <!-- /////////////////// GLOBAL CONFIGURATIONS ///////////////////// -->
+        <physics name="fast" type="ignored">
+            <max_step_size>0.001</max_step_size>
+            <real_time_factor>1.0</real_time_factor>
+        </physics>
+        <plugin filename="gz-sim-physics-system"
+                name="gz::sim::systems::Physics"/>
+        <plugin filename="gz-sim-user-commands-system"
+                name="gz::sim::systems::UserCommands"/>
+        <plugin filename="gz-sim-scene-broadcaster-system"
+                name="gz::sim::systems::SceneBroadcaster"/>
+
+        <!-- /////////////////// GUI CONSIDERATIONS ///////////////////// -->
+        <gui fullscreen="0">
+            <plugin filename="GzScene3D" name="3D View">
+                <gz-gui>
+                    <title>3D View</title>
+                    <property type="bool" key="showTitleBar">false</property>
+                    <property type="string" key="state">docked</property>
+                </gz-gui>
+                <engine>ogre2</engine>
+                <scene>scene</scene>
+                <ambient_light>0.4 0.4 0.4</ambient_light>
+                <background_color>0.8 0.8 0.8</background_color>
+                <!-- Angled top-down view to see the full maze -->
+                <camera_pose>0 -14 10 0 0.8 1.57</camera_pose>
+            </plugin>
+
+            <plugin filename="EntityContextMenuPlugin" name="Entity context menu">
+                <gz-gui>
+                    <property key="state" type="string">floating</property>
+                    <property key="width" type="double">5</property>
+                    <property key="height" type="double">5</property>
+                    <property key="showTitleBar" type="bool">false</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="InteractiveViewControl" name="Interactive view control">
+                <gz-gui>
+                    <property key="resizable" type="bool">false</property>
+                    <property key="width" type="double">5</property>
+                    <property key="height" type="double">5</property>
+                    <property key="state" type="string">floating</property>
+                    <property key="showTitleBar" type="bool">false</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="CameraTracking" name="Camera Tracking">
+                <gz-gui>
+                    <property key="resizable" type="bool">false</property>
+                    <property key="width" type="double">5</property>
+                    <property key="height" type="double">5</property>
+                    <property key="state" type="string">floating</property>
+                    <property key="showTitleBar" type="bool">false</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="WorldControl" name="WorldControl">
+                <gz-gui>
+                    <title>World control</title>
+                    <property type="bool" key="showTitleBar">false</property>
+                    <property type="bool" key="resizable">false</property>
+                    <property type="double" key="height">72</property>
+                    <property type="double" key="width">121</property>
+                    <property type="double" key="z">1</property>
+                    <property type="string" key="state">floating</property>
+                    <anchors target="3D View">
+                        <line own="left" target="left"/>
+                        <line own="bottom" target="bottom"/>
+                    </anchors>
+                </gz-gui>
+                <play_pause>true</play_pause>
+                <step>true</step>
+                <start_paused>true</start_paused>
+            </plugin>
+
+            <plugin filename="WorldStats" name="WorldStats">
+                <gz-gui>
+                    <title>World stats</title>
+                    <property type="bool" key="showTitleBar">false</property>
+                    <property type="bool" key="resizable">false</property>
+                    <property type="double" key="height">110</property>
+                    <property type="double" key="width">290</property>
+                    <property type="double" key="z">1</property>
+                    <property type="string" key="state">floating</property>
+                    <anchors target="3D View">
+                        <line own="right" target="right"/>
+                        <line own="bottom" target="bottom"/>
+                    </anchors>
+                </gz-gui>
+                <sim_time>true</sim_time>
+                <real_time>true</real_time>
+                <real_time_factor>true</real_time_factor>
+                <iterations>true</iterations>
+            </plugin>
+
+            <plugin filename="Shapes" name="Shapes">
+                <gz-gui>
+                    <property key="resizable" type="bool">false</property>
+                    <property key="x" type="double">0</property>
+                    <property key="y" type="double">0</property>
+                    <property key="width" type="double">250</property>
+                    <property key="height" type="double">50</property>
+                    <property key="state" type="string">floating</property>
+                    <property key="showTitleBar" type="bool">false</property>
+                    <property key="cardBackground" type="string">#666666</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="Lights" name="Lights">
+                <gz-gui>
+                    <property key="resizable" type="bool">false</property>
+                    <property key="x" type="double">250</property>
+                    <property key="y" type="double">0</property>
+                    <property key="width" type="double">150</property>
+                    <property key="height" type="double">50</property>
+                    <property key="state" type="string">floating</property>
+                    <property key="showTitleBar" type="bool">false</property>
+                    <property key="cardBackground" type="string">#666666</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="TransformControl" name="TransformControl">
+                <gz-gui>
+                    <property key="resizable" type="bool">false</property>
+                    <property key="x" type="double">0</property>
+                    <property key="y" type="double">50</property>
+                    <property key="width" type="double">250</property>
+                    <property key="height" type="double">50</property>
+                    <property key="state" type="string">floating</property>
+                    <property key="showTitleBar" type="bool">false</property>
+                    <property key="cardBackground" type="string">#777777</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="Screenshot" name="Screenshot">
+                <gz-gui>
+                    <property key="resizable" type="bool">false</property>
+                    <property key="x" type="double">250</property>
+                    <property key="y" type="double">50</property>
+                    <property key="width" type="double">50</property>
+                    <property key="height" type="double">50</property>
+                    <property key="state" type="string">floating</property>
+                    <property key="showTitleBar" type="bool">false</property>
+                    <property key="cardBackground" type="string">#777777</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="EntityTree" name="Entity tree">
+                <gz-gui>
+                    <property type="string" key="state">docked_collapsed</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="ComponentInspector" name="Component inspector">
+                <gz-gui>
+                    <property type="string" key="state">docked_collapsed</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="ImageDisplay" name="Image Display 2">
+                <gz-gui>
+                    <title>Depth camera</title>
+                    <property key="state" type="string">floating</property>
+                    <property type="double" key="width">350</property>
+                    <property type="double" key="height">315</property>
+                    <property type="double" key="x">1070</property>
+                </gz-gui>
+                <topic>/world/mapping_maze/model/orion/link/base_link/sensor/camera/depth_image</topic>
+                <topic_picker>true</topic_picker>
+            </plugin>
+
+            <plugin filename="ImageDisplay" name="Image Display 3">
+                <gz-gui>
+                    <title>Camera Image</title>
+                    <property key="state" type="string">floating</property>
+                    <property type="double" key="width">350</property>
+                    <property type="double" key="height">315</property>
+                    <property type="double" key="y">320</property>
+                    <property type="double" key="x">1070</property>
+                </gz-gui>
+                <topic>/world/mapping_maze/model/orion/link/base_link/sensor/camera/image</topic>
+                <topic_picker>true</topic_picker>
+            </plugin>
+
+            <plugin filename="VisualizeLidar" name="Visualize Lidar">
+                <gz-gui>
+                    <property type="string" key="state">docked_collapsed</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="JointPositionController" name="Joint Position Controller">
+                <gz-gui>
+                    <property type="string" key="state">docked_collapsed</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="Teleop" name="Teleop">
+                <gz-gui>
+                    <property type="string" key="state">docked</property>
+                </gz-gui>
+                <topic>/model/orion/cmd_vel</topic>
+            </plugin>
+        </gui>
+
+        <!-- //////////////////////// Scene configuration //////////////// -->
+        <scene>
+            <ambient>1 1 1 1</ambient>
+            <background>0.3 0.7 0.9 1</background>
+            <shadows>1</shadows>
+            <grid>true</grid>
+        </scene>
+
+        <light type="directional" name="sun">
+            <cast_shadows>true</cast_shadows>
+            <pose>0 0 10 0 0 0</pose>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+            <attenuation>
+                <range>1000</range>
+                <constant>0.9</constant>
+                <linear>0.01</linear>
+                <quadratic>0.001</quadratic>
+            </attenuation>
+            <direction>-0.5 0.1 -0.9</direction>
+        </light>
+
+        <!-- Ground plane -->
+        <model name="ground_plane">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <plane><normal>0 0 1</normal><size>100 100</size></plane>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <plane><normal>0 0 1</normal><size>100 100</size></plane>
+                    </geometry>
+                    <material>
+                        <ambient>0.8 0.8 0.8 1</ambient>
+                        <diffuse>0.8 0.8 0.8 1</diffuse>
+                        <specular>0.8 0.8 0.8 1</specular>
+                    </material>
+                </visual>
+            </link>
+        </model>
+
+        <!--
+          ================================================================
+          MAZE WALLS — all static boxes, height 0.8 m, thickness 0.2 m.
+
+          Layout diagram (top view, each square ~ 1 m):
+
+              -5   -4   -3   -2   -1    0    1    2    3    4    5
+          5  [====================================================]
+          4  [|  NW dead-end  |  gap  |       NE open       |    ]
+          3  [| alcove_nw |gap|       | div_north continues |    ]
+          2  [|           |   |island_north (y=2)           |    ]
+          1  [| west      | gap| island (center)  |gap|east |    ]
+          0  [| div_west..|gap|  island_west       |gap|..div_east]
+         -1  [|           |   | island (center)  |gap|     |    ]
+         -2  [|           |   |island_south (y=-2)          |    ]
+         -3  [|           |   |       | div_south continues |    ]
+         -4  [|           |   |       | gap   | SE dead-end |    ]
+         -5  [====================================================]
+
+          Corridor widths (robot is 0.33 m wide):
+            Outer ring strips  : 3.0 m  (between outer wall and island)
+            N/S divider gaps   : 1.0 m  (at x=0, between island wall and divider)
+            E/W divider gaps   : 1.0 m  (at y=0, between island wall and divider)
+            Island east entry  : 1.0 m  (y = -0.5 to +0.5)
+          ================================================================
+        -->
+
+        <!-- ===== OUTER PERIMETER WALLS ===== -->
+        <model name="outer_south">
+            <static>true</static>
+            <pose>0 -5 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>10.4 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>10.4 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="outer_north">
+            <static>true</static>
+            <pose>0 5 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>10.4 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>10.4 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="outer_west">
+            <static>true</static>
+            <pose>-5 0 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 10.4 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 10.4 0.8</size></box></geometry>
+                    <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="outer_east">
+            <static>true</static>
+            <pose>5 0 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 10.4 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 10.4 0.8</size></box></geometry>
+                    <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- ===== CENTRAL ISLAND WALLS (4 x 4 m box, open east side) ===== -->
+        <!-- North wall of island: x = -2 to +2 at y = 2 -->
+        <model name="island_north">
+            <static>true</static>
+            <pose>0 2 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>4.2 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>4.2 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.3 0.5 0.8 1</ambient><diffuse>0.3 0.5 0.8 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- South wall of island: x = -2 to +2 at y = -2 -->
+        <model name="island_south">
+            <static>true</static>
+            <pose>0 -2 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>4.2 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>4.2 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.3 0.5 0.8 1</ambient><diffuse>0.3 0.5 0.8 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- West wall of island: y = -2 to +2 at x = -2 -->
+        <model name="island_west">
+            <static>true</static>
+            <pose>-2 0 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 4.0 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 4.0 0.8</size></box></geometry>
+                    <material><ambient>0.3 0.5 0.8 1</ambient><diffuse>0.3 0.5 0.8 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- East wall of island — north half: y = +0.5 to +2.0 at x = 2 -->
+        <!-- Gap: y = -0.5 to +0.5 (1.0 m opening, ORION 0.33 m wide fits easily) -->
+        <model name="island_east_north">
+            <static>true</static>
+            <pose>2 1.25 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 1.5 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 1.5 0.8</size></box></geometry>
+                    <material><ambient>0.3 0.5 0.8 1</ambient><diffuse>0.3 0.5 0.8 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- East wall of island — south half: y = -2.0 to -0.5 at x = 2 -->
+        <model name="island_east_south">
+            <static>true</static>
+            <pose>2 -1.25 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 1.5 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 1.5 0.8</size></box></geometry>
+                    <material><ambient>0.3 0.5 0.8 1</ambient><diffuse>0.3 0.5 0.8 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- ===== CORRIDOR DIVIDERS (force 1 m narrow crossings) ===== -->
+        <!--
+          Each divider splits one side of the outer ring and leaves a 1 m gap
+          that the robot must pass through.  This creates "checkpoints" that
+          are rich in LIDAR features and force careful navigation.
+        -->
+
+        <!-- North divider: x = 0, y = 3 → 5  (gap: y = 2 to 3) -->
+        <model name="div_north">
+            <static>true</static>
+            <pose>0 4 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 2.0 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 2.0 0.8</size></box></geometry>
+                    <material><ambient>0.8 0.5 0.2 1</ambient><diffuse>0.8 0.5 0.2 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- South divider: x = 0, y = -5 → -3  (gap: y = -3 to -2) -->
+        <model name="div_south">
+            <static>true</static>
+            <pose>0 -4 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 2.0 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 2.0 0.8</size></box></geometry>
+                    <material><ambient>0.8 0.5 0.2 1</ambient><diffuse>0.8 0.5 0.2 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- West divider: y = 0, x = -5 → -3  (gap: x = -3 to -2) -->
+        <model name="div_west">
+            <static>true</static>
+            <pose>-4 0 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>2.0 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>2.0 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.8 0.5 0.2 1</ambient><diffuse>0.8 0.5 0.2 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- East divider: y = 0, x = 3 → 5  (gap: x = 2 to 3) -->
+        <model name="div_east">
+            <static>true</static>
+            <pose>4 0 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>2.0 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>2.0 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.8 0.5 0.2 1</ambient><diffuse>0.8 0.5 0.2 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- ===== DEAD-END ALCOVES (mapping challenge, no exit) ===== -->
+        <!--
+          NW alcove wall: y = 3.5, x = -5 → -2
+          Creates a blind pocket in the north-west quadrant.
+          The robot enters from the right side (x > -2) at y = 3.5 → 5.
+        -->
+        <model name="alcove_nw">
+            <static>true</static>
+            <pose>-3.5 3.5 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>3.0 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>3.0 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.7 0.2 0.2 1</ambient><diffuse>0.7 0.2 0.2 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!--
+          SE alcove wall: y = -3.5, x = 2 → 5
+          Creates a blind pocket in the south-east quadrant.
+        -->
+        <model name="alcove_se">
+            <static>true</static>
+            <pose>3.5 -3.5 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>3.0 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>3.0 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.7 0.2 0.2 1</ambient><diffuse>0.7 0.2 0.2 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+    </world>
+</sdf>

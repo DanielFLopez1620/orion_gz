@@ -1,0 +1,496 @@
+<?xml version="1.0" ?>
+
+<!--
+  turtle_world.sdf
+  Self-contained recreation of the classic TurtleBot3 arena.
+  The original relied on Gazebo Fuel URLs and a model:// URI that failed
+  without internet or the turtlebot3_gazebo package installed.
+
+  Design: 6 x 6 m outer boundary, inner 2.4 x 2.4 m square structure with
+  one 1 m opening on each side, and four cylindrical pillars in the corners.
+  All geometry is inline — no external dependencies.
+
+  Compatible with ORION (0.33 x 0.23 x 0.38 m). All corridors >= 1 m wide.
+-->
+
+<sdf version="1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://sdformat.org/schemas/root.xsd">
+    <world name="turtle_world">
+
+        <!-- /////////////////// GLOBAL CONFIGURATIONS ///////////////////// -->
+        <physics name="fast" type="ignored">
+            <max_step_size>0.001</max_step_size>
+            <real_time_factor>1.0</real_time_factor>
+        </physics>
+        <plugin filename="gz-sim-physics-system"
+                name="gz::sim::systems::Physics"/>
+        <plugin filename="gz-sim-user-commands-system"
+                name="gz::sim::systems::UserCommands"/>
+        <plugin filename="gz-sim-scene-broadcaster-system"
+                name="gz::sim::systems::SceneBroadcaster"/>
+
+        <!-- /////////////////// GUI CONSIDERATIONS ///////////////////// -->
+        <gui fullscreen="0">
+            <plugin filename="GzScene3D" name="3D View">
+                <gz-gui>
+                    <title>3D View</title>
+                    <property type="bool" key="showTitleBar">false</property>
+                    <property type="string" key="state">docked</property>
+                </gz-gui>
+                <engine>ogre2</engine>
+                <scene>scene</scene>
+                <ambient_light>0.4 0.4 0.4</ambient_light>
+                <background_color>0.8 0.8 0.8</background_color>
+                <camera_pose>0 -9 7 0 0.7 1.57</camera_pose>
+            </plugin>
+
+            <plugin filename="EntityContextMenuPlugin" name="Entity context menu">
+                <gz-gui>
+                    <property key="state" type="string">floating</property>
+                    <property key="width" type="double">5</property>
+                    <property key="height" type="double">5</property>
+                    <property key="showTitleBar" type="bool">false</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="InteractiveViewControl" name="Interactive view control">
+                <gz-gui>
+                    <property key="resizable" type="bool">false</property>
+                    <property key="width" type="double">5</property>
+                    <property key="height" type="double">5</property>
+                    <property key="state" type="string">floating</property>
+                    <property key="showTitleBar" type="bool">false</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="CameraTracking" name="Camera Tracking">
+                <gz-gui>
+                    <property key="resizable" type="bool">false</property>
+                    <property key="width" type="double">5</property>
+                    <property key="height" type="double">5</property>
+                    <property key="state" type="string">floating</property>
+                    <property key="showTitleBar" type="bool">false</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="WorldControl" name="WorldControl">
+                <gz-gui>
+                    <title>World control</title>
+                    <property type="bool" key="showTitleBar">false</property>
+                    <property type="bool" key="resizable">false</property>
+                    <property type="double" key="height">72</property>
+                    <property type="double" key="width">121</property>
+                    <property type="double" key="z">1</property>
+                    <property type="string" key="state">floating</property>
+                    <anchors target="3D View">
+                        <line own="left" target="left"/>
+                        <line own="bottom" target="bottom"/>
+                    </anchors>
+                </gz-gui>
+                <play_pause>true</play_pause>
+                <step>true</step>
+                <start_paused>true</start_paused>
+            </plugin>
+
+            <plugin filename="WorldStats" name="WorldStats">
+                <gz-gui>
+                    <title>World stats</title>
+                    <property type="bool" key="showTitleBar">false</property>
+                    <property type="bool" key="resizable">false</property>
+                    <property type="double" key="height">110</property>
+                    <property type="double" key="width">290</property>
+                    <property type="double" key="z">1</property>
+                    <property type="string" key="state">floating</property>
+                    <anchors target="3D View">
+                        <line own="right" target="right"/>
+                        <line own="bottom" target="bottom"/>
+                    </anchors>
+                </gz-gui>
+                <sim_time>true</sim_time>
+                <real_time>true</real_time>
+                <real_time_factor>true</real_time_factor>
+                <iterations>true</iterations>
+            </plugin>
+
+            <plugin filename="Shapes" name="Shapes">
+                <gz-gui>
+                    <property key="resizable" type="bool">false</property>
+                    <property key="x" type="double">0</property>
+                    <property key="y" type="double">0</property>
+                    <property key="width" type="double">250</property>
+                    <property key="height" type="double">50</property>
+                    <property key="state" type="string">floating</property>
+                    <property key="showTitleBar" type="bool">false</property>
+                    <property key="cardBackground" type="string">#666666</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="Lights" name="Lights">
+                <gz-gui>
+                    <property key="resizable" type="bool">false</property>
+                    <property key="x" type="double">250</property>
+                    <property key="y" type="double">0</property>
+                    <property key="width" type="double">150</property>
+                    <property key="height" type="double">50</property>
+                    <property key="state" type="string">floating</property>
+                    <property key="showTitleBar" type="bool">false</property>
+                    <property key="cardBackground" type="string">#666666</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="TransformControl" name="TransformControl">
+                <gz-gui>
+                    <property key="resizable" type="bool">false</property>
+                    <property key="x" type="double">0</property>
+                    <property key="y" type="double">50</property>
+                    <property key="width" type="double">250</property>
+                    <property key="height" type="double">50</property>
+                    <property key="state" type="string">floating</property>
+                    <property key="showTitleBar" type="bool">false</property>
+                    <property key="cardBackground" type="string">#777777</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="Screenshot" name="Screenshot">
+                <gz-gui>
+                    <property key="resizable" type="bool">false</property>
+                    <property key="x" type="double">250</property>
+                    <property key="y" type="double">50</property>
+                    <property key="width" type="double">50</property>
+                    <property key="height" type="double">50</property>
+                    <property key="state" type="string">floating</property>
+                    <property key="showTitleBar" type="bool">false</property>
+                    <property key="cardBackground" type="string">#777777</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="EntityTree" name="Entity tree">
+                <gz-gui>
+                    <property type="string" key="state">docked_collapsed</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="ComponentInspector" name="Component inspector">
+                <gz-gui>
+                    <property type="string" key="state">docked_collapsed</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="ImageDisplay" name="Image Display 2">
+                <gz-gui>
+                    <title>Depth camera</title>
+                    <property key="state" type="string">floating</property>
+                    <property type="double" key="width">350</property>
+                    <property type="double" key="height">315</property>
+                    <property type="double" key="x">1070</property>
+                </gz-gui>
+                <topic>/world/turtle_world/model/orion/link/base_link/sensor/camera/depth_image</topic>
+                <topic_picker>true</topic_picker>
+            </plugin>
+
+            <plugin filename="ImageDisplay" name="Image Display 3">
+                <gz-gui>
+                    <title>Camera Image</title>
+                    <property key="state" type="string">floating</property>
+                    <property type="double" key="width">350</property>
+                    <property type="double" key="height">315</property>
+                    <property type="double" key="y">320</property>
+                    <property type="double" key="x">1070</property>
+                </gz-gui>
+                <topic>/world/turtle_world/model/orion/link/base_link/sensor/camera/image</topic>
+                <topic_picker>true</topic_picker>
+            </plugin>
+
+            <plugin filename="VisualizeLidar" name="Visualize Lidar">
+                <gz-gui>
+                    <property type="string" key="state">docked_collapsed</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="JointPositionController" name="Joint Position Controller">
+                <gz-gui>
+                    <property type="string" key="state">docked_collapsed</property>
+                </gz-gui>
+            </plugin>
+
+            <plugin filename="Teleop" name="Teleop">
+                <gz-gui>
+                    <property type="string" key="state">docked</property>
+                </gz-gui>
+                <topic>/model/orion/cmd_vel</topic>
+            </plugin>
+        </gui>
+
+        <!-- //////////////////////// Scene configuration //////////////// -->
+        <scene>
+            <ambient>1 1 1 1</ambient>
+            <background>0.3 0.7 0.9 1</background>
+            <shadows>1</shadows>
+            <grid>true</grid>
+        </scene>
+
+        <light type="directional" name="sun">
+            <cast_shadows>true</cast_shadows>
+            <pose>0 0 10 0 0 0</pose>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+            <attenuation>
+                <range>1000</range>
+                <constant>0.9</constant>
+                <linear>0.01</linear>
+                <quadratic>0.001</quadratic>
+            </attenuation>
+            <direction>-0.5 0.1 -0.9</direction>
+        </light>
+
+        <!-- Ground plane -->
+        <model name="ground_plane">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                    <geometry>
+                        <plane><normal>0 0 1</normal><size>100 100</size></plane>
+                    </geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry>
+                        <plane><normal>0 0 1</normal><size>100 100</size></plane>
+                    </geometry>
+                    <material>
+                        <ambient>0.8 0.8 0.8 1</ambient>
+                        <diffuse>0.8 0.8 0.8 1</diffuse>
+                        <specular>0.8 0.8 0.8 1</specular>
+                    </material>
+                </visual>
+            </link>
+        </model>
+
+        <!--
+          ================================================================
+          TURTLE WORLD ARENA — inspired by the classic TurtleBot3 world.
+
+          Layout (top view, 6 x 6 m outer boundary):
+
+              -3    -2    -1     0     1     2     3
+          3   [======================wall=============]
+          2   [|  pillar  |  inner north wall  |  p  ]
+          1   [|          gap  |          |  gap     ]
+          0   [|  inner W |       inner   | inner E  ]
+         -1   [|          gap  |          |  gap     ]
+         -2   [|  pillar  |  inner south wall  |  p  ]
+         -3   [======================wall=============]
+
+          Inner square: 2.4 x 2.4 m (x: ±1.2, y: ±1.2)
+          Each side has a 1.0 m opening (centred at 0) → two 0.7 m wall pieces.
+          Pillars (r=0.15 m) at (±2, ±2).
+          All open corridors: min 1.8 m wide — ORION (0.33 m) fits easily.
+          ================================================================
+        -->
+
+        <!-- ===== OUTER PERIMETER WALLS (6 x 6 m) ===== -->
+        <model name="outer_south">
+            <static>true</static>
+            <pose>0 -3 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>6.4 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>6.4 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.55 0.55 0.55 1</ambient><diffuse>0.55 0.55 0.55 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="outer_north">
+            <static>true</static>
+            <pose>0 3 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>6.4 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>6.4 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.55 0.55 0.55 1</ambient><diffuse>0.55 0.55 0.55 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="outer_west">
+            <static>true</static>
+            <pose>-3 0 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 6.4 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 6.4 0.8</size></box></geometry>
+                    <material><ambient>0.55 0.55 0.55 1</ambient><diffuse>0.55 0.55 0.55 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="outer_east">
+            <static>true</static>
+            <pose>3 0 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 6.4 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 6.4 0.8</size></box></geometry>
+                    <material><ambient>0.55 0.55 0.55 1</ambient><diffuse>0.55 0.55 0.55 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!--
+          ===== INNER SQUARE WALLS (2.4 x 2.4 m centred at origin) =====
+          Each side is split in two, leaving a 1.0 m central gap.
+          Wall piece length = (2.4 - 1.0) / 2 = 0.7 m
+          Centre of each piece: ±(0.5 + 0.35) = ±0.85 from origin along the side axis.
+        -->
+
+        <!-- South side of inner square (y = -1.2) -->
+        <model name="inner_south_w">
+            <static>true</static>
+            <pose>-0.85 -1.2 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.7 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.7 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.25 0.45 0.75 1</ambient><diffuse>0.25 0.45 0.75 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="inner_south_e">
+            <static>true</static>
+            <pose>0.85 -1.2 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.7 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.7 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.25 0.45 0.75 1</ambient><diffuse>0.25 0.45 0.75 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- North side of inner square (y = +1.2) -->
+        <model name="inner_north_w">
+            <static>true</static>
+            <pose>-0.85 1.2 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.7 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.7 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.25 0.45 0.75 1</ambient><diffuse>0.25 0.45 0.75 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="inner_north_e">
+            <static>true</static>
+            <pose>0.85 1.2 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.7 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.7 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.25 0.45 0.75 1</ambient><diffuse>0.25 0.45 0.75 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- West side of inner square (x = -1.2) -->
+        <model name="inner_west_s">
+            <static>true</static>
+            <pose>-1.2 -0.85 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 0.7 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 0.7 0.8</size></box></geometry>
+                    <material><ambient>0.25 0.45 0.75 1</ambient><diffuse>0.25 0.45 0.75 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="inner_west_n">
+            <static>true</static>
+            <pose>-1.2 0.85 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 0.7 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 0.7 0.8</size></box></geometry>
+                    <material><ambient>0.25 0.45 0.75 1</ambient><diffuse>0.25 0.45 0.75 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- East side of inner square (x = +1.2) -->
+        <model name="inner_east_s">
+            <static>true</static>
+            <pose>1.2 -0.85 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 0.7 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 0.7 0.8</size></box></geometry>
+                    <material><ambient>0.25 0.45 0.75 1</ambient><diffuse>0.25 0.45 0.75 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="inner_east_n">
+            <static>true</static>
+            <pose>1.2 0.85 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 0.7 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 0.7 0.8</size></box></geometry>
+                    <material><ambient>0.25 0.45 0.75 1</ambient><diffuse>0.25 0.45 0.75 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- ===== CORNER PILLARS (radius 0.15 m, height 0.8 m) ===== -->
+        <model name="pillar_ne">
+            <static>true</static>
+            <pose>2 2 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><cylinder><radius>0.15</radius><length>0.8</length></cylinder></geometry></collision>
+                <visual name="visual">
+                    <geometry><cylinder><radius>0.15</radius><length>0.8</length></cylinder></geometry>
+                    <material><ambient>0.7 0.35 0.1 1</ambient><diffuse>0.7 0.35 0.1 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="pillar_nw">
+            <static>true</static>
+            <pose>-2 2 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><cylinder><radius>0.15</radius><length>0.8</length></cylinder></geometry></collision>
+                <visual name="visual">
+                    <geometry><cylinder><radius>0.15</radius><length>0.8</length></cylinder></geometry>
+                    <material><ambient>0.7 0.35 0.1 1</ambient><diffuse>0.7 0.35 0.1 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="pillar_se">
+            <static>true</static>
+            <pose>2 -2 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><cylinder><radius>0.15</radius><length>0.8</length></cylinder></geometry></collision>
+                <visual name="visual">
+                    <geometry><cylinder><radius>0.15</radius><length>0.8</length></cylinder></geometry>
+                    <material><ambient>0.7 0.35 0.1 1</ambient><diffuse>0.7 0.35 0.1 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="pillar_sw">
+            <static>true</static>
+            <pose>-2 -2 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><cylinder><radius>0.15</radius><length>0.8</length></cylinder></geometry></collision>
+                <visual name="visual">
+                    <geometry><cylinder><radius>0.15</radius><length>0.8</length></cylinder></geometry>
+                    <material><ambient>0.7 0.35 0.1 1</ambient><diffuse>0.7 0.35 0.1 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+    </world>
+</sdf>
