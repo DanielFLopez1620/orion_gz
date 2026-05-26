@@ -9,7 +9,7 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <build_depend>gz-sim8</build_depend>
+  <build_depend>ament_index_cpp</build_depend>
   <build_depend>gz-transport13</build_depend>
   <build_depend>gz-msgs10</build_depend>
   <build_depend>gz-plugin2</build_depend>
@@ -17,7 +17,7 @@
   <build_depend>gz-rendering8</build_depend>
   <build_depend>gz-common5</build_depend>
 
-  <exec_depend>gz-sim8</exec_depend>
+  <exec_depend>ament_index_cpp</exec_depend>
   <exec_depend>gz-transport13</exec_depend>
   <exec_depend>gz-msgs10</exec_depend>
   <exec_depend>gz-gui8</exec_depend>

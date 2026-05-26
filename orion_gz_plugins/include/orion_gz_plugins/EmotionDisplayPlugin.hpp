@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <atomic>
 #include <string>
 
@@ -11,21 +12,23 @@
 namespace orion_gz_plugins
 {
 
-/// GUI plugin that subscribes to /emotion/int (Int32 [0-7]) and changes the
-/// material color of the "screen_visual" visual in the GZ rendering scene.
+/// GUI plugin that renders the ORION emotion face bitmaps as textures on the
+/// "screen_visual" visual inside the GZ rendering scene.
 ///
-/// Runs in the render thread via the Render event — directly modifies the
-/// Ogre2 material without going through the ECM/SceneBroadcaster pipeline.
+/// Textures are generated at build time from the 176×220 1-bit bitmaps in
+/// orion_interaction_micro_ros/emotions.hpp (bit=1 → emotion color, bit=0 → black).
+/// At runtime the plugin uses ament_index to locate the installed PNGs and
+/// applies them via gz::rendering::Material::SetTexture().
 ///
-/// Colors are converted from the RGB565 table in orion_interaction_micro_ros
-/// (emotions.hpp):
-///   0 angry    0xFA88  1 disgust  0x87E0  2 fear     0xBB98  3 happy    0xFEA4
-///   4 neutral  0xFFFF  5 sad      0x5DDF  6 surprise 0x07F8  7 wink     0xFFFF
+/// Index → emotion mapping (matches emotion_color[] in emotions.hpp):
+///   0 angry  1 disgust  2 fear  3 happy  4 neutral  5 sad  6 surprise  7 wink
 ///
 /// GUI config usage (world SDF <gui> section):
 ///   <plugin name="EmotionDisplayPlugin" filename="libEmotionDisplayPlugin.so">
-///     <!-- optional: override target visual name (substring match) -->
+///     <!-- optional: override target visual (substring match on scoped name) -->
 ///     <visual_name>screen_visual</visual_name>
+///     <!-- optional: override texture directory -->
+///     <texture_dir>/absolute/path/to/textures</texture_dir>
 ///   </plugin>
 class EmotionDisplayPlugin : public gz::gui::Plugin
 {
@@ -51,9 +54,11 @@ private:
     int lastEmotion{-1};
 
     std::string visualName{"screen_visual"};
+    std::string textureDir;
 
     static constexpr int NUM_EMOTIONS = 8;
-    static const float EMOTION_COLORS[NUM_EMOTIONS][3];
+    std::array<gz::rendering::MaterialPtr, NUM_EMOTIONS> emotionMaterials;
+    bool materialsLoaded{false};
 };
 
 }  // namespace orion_gz_plugins

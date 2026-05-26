@@ -5,18 +5,17 @@
   simulation stack.
 
   Features:
-    - EmotionDisplayPlugin loaded on the orion_demo model.
-      Publish a number 0-7 to test:
-        gz topic -t /emotion/int -m gz.msgs.Int32 -p "data: 3"
+    - EmotionColorPlugin  : solid colour on "screen_color_visual" (no textures)
+    - EmotionDisplayPlugin: face bitmap texture on "screen_visual"
+    - TouchSensorPlugin   : left-click on any blue sensor box
 
-    - TouchSensorPlugin loaded in the <gui> section.
-      Left-click on any blue sensor box. Listen with:
-        gz topic -e -t /interaction/touch_ul
+  Publish an emotion (0-7) to test both plugins simultaneously:
+    gz topic -t /emotion/int -m gz.msgs.Int32 -p "data: 3"
 
-  Plugin library paths must be on GZ_SIM_SYSTEM_PLUGIN_PATH (system plugin)
-  and GZ_GUI_PLUGIN_PATH (GUI plugin), or set via the environment before
-  launching:
-    export GZ_SIM_SYSTEM_PLUGIN_PATH=<install>/lib:$GZ_SIM_SYSTEM_PLUGIN_PATH
+  Listen to touch sensors:
+    gz topic -e -t /interaction/touch_ul
+
+  Plugin library paths must be on GZ_GUI_PLUGIN_PATH before launching:
     export GZ_GUI_PLUGIN_PATH=<install>/lib:$GZ_GUI_PLUGIN_PATH
 -->
 <sdf version="1.9">
@@ -60,11 +59,17 @@
     <!--
       ═══════════════════════════════════════════════════════════════════════
       ORION DEMO MODEL
-      Represents the ORION body with a "screen" link (emotion display) and
-      four "touch_*" links (capacitive sensor zones).
 
-      Adjust the mesh paths to point at the real ORION meshes once the full
-      simulation is integrated.
+      Screen assembly (landscape, matches rotated 220×176 px PNG output):
+
+        screen_color → "screen_color_visual"  (0.060×0.012×0.044 m)
+          Deeper prism for the EmotionColorPlugin solid-colour effect.
+          Direct child of body, centred on the front face.
+
+        screen → "screen_visual"              (0.055×0.002×0.040 m)
+          Thin flat panel for the EmotionDisplayPlugin bitmap texture.
+          Child of screen_color, centred on it and protruding 2 mm forward.
+          Pose expressed relative to screen_color frame.
       ═══════════════════════════════════════════════════════════════════════
     -->
     <model name="orion_demo">
@@ -85,26 +90,50 @@
         </collision>
       </link>
 
-      <!-- ── Emotion display screen ──────────────────────────────────────── -->
-      <!-- Thin rectangle on the front face of the body (176×220 px → ~5×7 cm) -->
-      <link name="screen">
-        <pose>0 -0.072 0.03 0 0 0</pose>
-        <visual name="screen_visual">
-          <geometry><box><size>0.05 0.002 0.07</size></box></geometry>
+      <!-- ── Colour indicator (EmotionColorPlugin) — parent of screen ──── -->
+      <!--
+        Landscape prism: 60 mm wide × 12 mm deep × 44 mm tall.
+        Body front face is at Y=−0.07; half-depth = 0.006 → centre at Y=−0.076.
+      -->
+      <link name="screen_color">
+        <pose>0 -0.076 0.03 0 0 0</pose>
+        <visual name="screen_color_visual">
+          <geometry><box><size>0.060 0.012 0.044</size></box></geometry>
           <material>
-            <!-- Initial colour: neutral white (emotion 4) -->
             <ambient>1 1 1 1</ambient>
             <diffuse>1 1 1 1</diffuse>
             <emissive>0.25 0.25 0.25 1</emissive>
           </material>
         </visual>
       </link>
+      <joint name="screen_color_joint" type="fixed">
+        <parent>body</parent><child>screen_color</child>
+      </joint>
+
+      <!-- ── Texture screen (EmotionDisplayPlugin) — child of screen_color -->
+      <!--
+        Thin landscape panel: 55 mm wide × 2 mm deep × 40 mm tall.
+        Pose relative to screen_color: Y=−0.007 places its front face 2 mm
+        in front of screen_color's front face (−0.006 − 0.001 = −0.007 centre,
+        front face at −0.008 vs screen_color front at −0.006 → 2 mm protrusion).
+      -->
+      <link name="screen">
+        <pose relative_to="screen_color">0 -0.007 0 0 0 0</pose>
+        <visual name="screen_visual">
+          <geometry><box><size>0.055 0.002 0.040</size></box></geometry>
+          <material>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <emissive>0.15 0.15 0.15 1</emissive>
+          </material>
+        </visual>
+      </link>
       <joint name="screen_joint" type="fixed">
-        <parent>body</parent><child>screen</child>
+        <parent>screen_color</parent><child>screen</child>
       </joint>
 
       <!-- ── Touch sensor zones ─────────────────────────────────────────── -->
-      <!-- Upper-left (top of body, left side) -->
+      <!-- Upper-left -->
       <link name="touch_ul">
         <pose>-0.055 0 0.11 0 0 0</pose>
         <visual name="touch_ul">
@@ -142,7 +171,7 @@
         <parent>body</parent><child>touch_ur</child>
       </joint>
 
-      <!-- Lower-left (lateral, left side) -->
+      <!-- Lower-left (lateral) -->
       <link name="touch_ll">
         <pose>-0.095 0 0 0 0 0</pose>
         <visual name="touch_ll">
@@ -161,7 +190,7 @@
         <parent>body</parent><child>touch_ll</child>
       </joint>
 
-      <!-- Lower-right (lateral, right side) -->
+      <!-- Lower-right (lateral) -->
       <link name="touch_lr">
         <pose>0.095 0 0 0 0 0</pose>
         <visual name="touch_lr">
@@ -183,7 +212,7 @@
     </model>
 
     <!-- ═══════════════════════════════════════════════════════════════════
-         GUI section: load the TouchSensorPlugin
+         GUI plugins
          ═══════════════════════════════════════════════════════════════════ -->
     <gui fullscreen="0">
       <plugin filename="MinimalScene" name="3D View">
@@ -207,20 +236,30 @@
         <gz-gui><property type="bool" key="showTitleBar">false</property></gz-gui>
       </plugin>
 
-      <!-- EmotionDisplayPlugin -->
+      <!-- EmotionColorPlugin: solid colour on screen_color_visual -->
+      <plugin filename="libEmotionColorPlugin.so" name="EmotionColorPlugin">
+        <gz-gui>
+          <property type="bool" key="showTitleBar">false</property>
+          <property type="double" key="width">0</property>
+          <property type="double" key="height">0</property>
+        </gz-gui>
+        <visual_name>screen_color_visual</visual_name>
+      </plugin>
+
+      <!-- EmotionDisplayPlugin: bitmap texture on screen_visual -->
       <plugin filename="libEmotionDisplayPlugin.so" name="EmotionDisplayPlugin">
         <gz-gui>
           <property type="bool" key="showTitleBar">false</property>
           <property type="double" key="width">0</property>
           <property type="double" key="height">0</property>
         </gz-gui>
+        <visual_name>screen_visual</visual_name>
       </plugin>
 
       <!-- TouchSensorPlugin -->
       <plugin filename="libTouchSensorPlugin.so" name="TouchSensorPlugin">
         <gz-gui>
           <property type="bool" key="showTitleBar">false</property>
-          <!-- width/height 0 → headless panel, no visual widget needed -->
           <property type="double" key="width">0</property>
           <property type="double" key="height">0</property>
         </gz-gui>

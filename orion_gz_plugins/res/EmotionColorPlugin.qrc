@@ -1,0 +1,6 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource prefix="/libEmotionColorPlugin.so">
+    <file alias="libEmotionColorPlugin.so.qml">EmotionColorPlugin.qml</file>
+  </qresource>
+</RCC>
