@@ -25,7 +25,7 @@ The orion_gz package has been tested under [ROS](https://www.ros.org/) Jazzy and
 
 ## 🚀 Launch files
 
-Make sure you have followed the [installation_process](/README.md) for the GZ package and the [ORION common](https://github.com/Tesis-ORION/orion_common) repository, also you should have sourced your workspace before you continue:
+Make sure you have followed the [installation_process](/README.md) for the GZ package and the [ORION common](https://github.com/DanielFLopez1620/orion_common) repository, also you should have sourced your workspace before you continue:
 
 ### Robot State Publisher for Gazebo
 
@@ -72,7 +72,7 @@ Spawn the robot in a given world of the simulator GZ Sim by considering the [spa
 ros2 launch orion_gz spawn_robot.launch.py camera:=astra_s 
 ~~~
 
-![spawn_robot](https://github.com/Tesis-ORION/orion_common/blob/main/docs/readmes/spawn_robot.gif)
+![spawn_robot](https://github.com/DanielFLopez1620/orion_common/blob/main/docs/readmes/spawn_robot.gif)
 
 ### Gazebo launch with ROS Bridge
 
@@ -97,7 +97,7 @@ Spawn the robot and includes the proper bridges to make possible the communicati
 ros2 launch orion_gz gz_ros.launch.py rasp:=rpi5 camera:=os30a
 ~~~
 
-![gz_ros_launch](https://github.com/Tesis-ORION/orion_common/blob/main/docs/readmes/gz_ros.gif)
+![gz_ros_launch](https://github.com/DanielFLopez1620/orion_common/blob/main/docs/readmes/gz_ros.gif)
 
 ### Gazebo launch with ros2_control
 
@@ -122,7 +122,7 @@ Spawn the robot and includes the configuration of bridges for sensors while also
 ros2 launch orion_gz gz_ros2_control.launch.py rasp:=rpi4 camera:=os30a
 ~~~
 
-![gz_ros2_control_launch](https://github.com/Tesis-ORION/orion_common/blob/main/docs/readmes/gz_ros2_control.gif)
+![gz_ros2_control_launch](https://github.com/DanielFLopez1620/orion_common/blob/main/docs/readmes/gz_ros2_control.gif)
 
 ---
 

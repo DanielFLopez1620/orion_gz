@@ -54,9 +54,9 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        accel:
+        g_mov_accel:
           Value: true
-        accel_base:
+        g_mov_accel_base:
           Value: true
         b18650_1_1:
           Value: true
@@ -120,7 +120,7 @@ Visualization Manager:
           Value: true
         g_mov_cam_link_optical:
           Value: true
-        imu:
+        g_mov_imu:
           Value: true
         laser_scan:
           Value: true
@@ -212,9 +212,9 @@ Visualization Manager:
           Value: true
         odom:
           Value: true
-        picam:
+        g_mov_picam:
           Value: true
-        picam_sup:
+        g_mov_picam_sup:
           Value: true
         reg_support:
           Value: true
@@ -230,15 +230,15 @@ Visualization Manager:
           Value: true
         screen_sup:
           Value: true
-        servo:
+        g_mov_servo:
           Value: true
         servo_1:
           Value: true
         servo_2:
           Value: true
-        servo_base:
+        g_mov_servo_base:
           Value: true
-        servo_conn:
+        g_mov_servo_conn:
           Value: true
         servo_conn_1:
           Value: true
@@ -482,9 +482,9 @@ Visualization Manager:
             wall_flidar_1_2:
               {}
           base_l2_s1:
-            accel_base:
-              accel:
-                imu:
+            g_mov_accel_base:
+              g_mov_accel:
+                g_mov_imu:
                   {}
               m3x10_accel_base_fl:
                 {}
@@ -494,11 +494,11 @@ Visualization Manager:
                 {}
               m3x10_accel_base_rr:
                 {}
-              servo_base:
-                servo:
-                  servo_conn:
-                    picam_sup:
-                      picam:
+              g_mov_servo_base:
+                g_mov_servo:
+                  g_mov_servo_conn:
+                    g_mov_picam_sup:
+                      g_mov_picam:
                         g_mov_cam_link:
                           g_mov_cam_link_optical:
                             {}
@@ -600,12 +600,12 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        accel:
+        g_mov_accel:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        accel_base:
+        g_mov_accel_base:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -760,7 +760,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        imu:
+        g_mov_imu:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -983,12 +983,12 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        picam:
+        g_mov_picam:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        picam_sup:
+        g_mov_picam_sup:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -1028,7 +1028,7 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        servo:
+        g_mov_servo:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -1043,12 +1043,12 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        servo_base:
+        g_mov_servo_base:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        servo_conn:
+        g_mov_servo_conn:
           Alpha: 1
           Show Axes: false
           Show Trail: false

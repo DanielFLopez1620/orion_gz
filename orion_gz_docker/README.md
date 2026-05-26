@@ -2,7 +2,7 @@
 
 Containerized environment for working on the ORION Gazebo Harmonic simulation
 stack with ROS 2 Jazzy. The image is a thin layer on top of `orion_dev:latest`
-(from the [orion_common](https://github.com/Tesis-ORION/orion_common)
+(from the [orion_common](https://github.com/DanielFLopez1620/orion_common)
 repository), which already bundles Gazebo Harmonic, RViz2, Nav2, SLAM Toolbox,
 `gz_ros2_control`, and the rest of the ORION development tooling.
 
@@ -38,15 +38,15 @@ opening `orion_common` and treating `orion_gz` as a clone).
   and [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)
   extensions
 - `orion_base:latest` and `orion_dev:latest` images already built from
-  [orion_common](https://github.com/Tesis-ORION/orion_common). Follow the
+  [orion_common](https://github.com/DanielFLopez1620/orion_common). Follow the
   instructions in
-  [orion_common/orion_docker/README.md](https://github.com/Tesis-ORION/orion_common/blob/main/orion_docker/README.md)
+  [orion_common/orion_docker/README.md](https://github.com/DanielFLopez1620/orion_common/blob/main/orion_docker/README.md)
   for the first two layers.
 
 Quick reminder of the parent build steps:
 
 ```bash
-git clone https://github.com/Tesis-ORION/orion_common.git
+git clone https://github.com/DanielFLopez1620/orion_common.git
 cd orion_common
 docker build -t orion_base:latest orion_docker/base/
 docker build -t orion_dev:latest  orion_docker/dev/
@@ -74,7 +74,7 @@ The repository ships a `.devcontainer/` symlink at the root pointing to
 1. Clone this repository:
 
    ```bash
-   git clone https://github.com/Tesis-ORION/orion_gz.git
+   git clone https://github.com/DanielFLopez1620/orion_gz.git
    cd orion_gz
    ```
 

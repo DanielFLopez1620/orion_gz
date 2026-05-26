@@ -34,13 +34,13 @@ The ORION Common packages have been tested under [ROS](https://www.ros.org/) Jaz
 
 ## 📥 Installation
 
-1. Follow the installation steps of **[ORION Commons](https://github.com/Tesis-ORION/orion_common)** as they are required for the simulation.
+1. Follow the installation steps of **[ORION Commons](https://github.com/DanielFLopez1620/orion_common)** as they are required for the simulation.
 
 2. Clone this repository:
 
     ~~~bash
     cd ~/ros2_ws/src
-    git clone https://github.com/Tesis-ORION/orion_gz.git
+    git clone https://github.com/DanielFLopez1620/orion_gz.git
     ~~~
 
 3. Install the dependencies:
