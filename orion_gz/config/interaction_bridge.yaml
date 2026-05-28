@@ -1,0 +1,45 @@
+# Placeholders to be rewritten by launch file:
+# - <entity>: Replaced by entity name (e.g. "orion").
+# - <world>:  Replaced by the world name (without the .sdf suffix).
+#
+# This bridge handles the orion interaction surface: capacitive-touch button
+# events from Gazebo and the emotion index from ROS into Gazebo. Topics match
+# the conventions used by orion_interaction_micro_ros so ROS 2 nodes can be
+# kept unchanged between simulation and the real robot.
+
+# ── Touch sensors (GZ → ROS) ─────────────────────────────────────────────────
+# Published by orion_gz_plugins/TouchSensorPlugin (GUI plugin loaded via
+# orion_interaction_gui.config) every time the user left-clicks the
+# corresponding visual in the 3D view.
+- ros_topic_name: "interaction/touch_ul"
+  gz_topic_name: "/interaction/touch_ul"
+  ros_type_name: "std_msgs/msg/Bool"
+  gz_type_name: "gz.msgs.Boolean"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "interaction/touch_ur"
+  gz_topic_name: "/interaction/touch_ur"
+  ros_type_name: "std_msgs/msg/Bool"
+  gz_type_name: "gz.msgs.Boolean"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "interaction/touch_ll"
+  gz_topic_name: "/interaction/touch_ll"
+  ros_type_name: "std_msgs/msg/Bool"
+  gz_type_name: "gz.msgs.Boolean"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "interaction/touch_lr"
+  gz_topic_name: "/interaction/touch_lr"
+  ros_type_name: "std_msgs/msg/Bool"
+  gz_type_name: "gz.msgs.Boolean"
+  direction: GZ_TO_ROS
+
+# ── Emotion (ROS → GZ) ───────────────────────────────────────────────────────
+# Consumed by orion_gz_plugins/EmotionColorPlugin and EmotionDisplayPlugin
+# (System plugins attached to the model from orion_gz_interaction.urdf.xacro).
+- ros_topic_name: "emotion/int"
+  gz_topic_name: "/emotion/int"
+  ros_type_name: "std_msgs/msg/Int32"
+  gz_type_name: "gz.msgs.Int32"
+  direction: ROS_TO_GZ

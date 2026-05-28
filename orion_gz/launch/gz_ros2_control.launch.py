@@ -146,6 +146,7 @@ def generate_launch_description():
     a010_bridge_path = os.path.join(pkg_gz, 'config', 'a010_bridge.yaml')
     g_mov_bridge_path = os.path.join(pkg_gz, 'config', 'g_mov_short_bridge.yaml')
     os30a_bridge_path = os.path.join(pkg_gz, 'config', 'os30a_bridge.yaml')
+    interaction_bridge_path = os.path.join(pkg_gz, 'config', 'interaction_bridge.yaml')
 
     # Additional config set up
     extra_bridge_config = replace_entities(extra_bridge_path)
@@ -153,6 +154,7 @@ def generate_launch_description():
     a010_bridge_config = replace_entities(a010_bridge_path)
     g_mov_bridge_config = replace_entities(g_mov_bridge_path)
     os30a_bridge_config = replace_entities(os30a_bridge_path)
+    interaction_bridge_config = replace_entities(interaction_bridge_path)
 
 
     # Generate launch description
@@ -252,6 +254,20 @@ def generate_launch_description():
                 output='screen',
                 condition=IfCondition(PythonExpression(
                     ["'", LaunchConfiguration('camera'), "' == 'os30a'"])),
+           ),
+    )
+
+    # Interaction bridge (touch sensors GZ→ROS, emotion ROS→GZ). Unconditional
+    # here because gz_ros2_control already forces ros_bridge=true on the spawn.
+    ld.add_action(
+       Node(
+               package='ros_gz_bridge',
+               name="ros_gz_bridge_interaction",
+               executable='parameter_bridge',
+               parameters=[{
+                'config_file': interaction_bridge_config
+                }],
+                output='screen',
            ),
     )
 

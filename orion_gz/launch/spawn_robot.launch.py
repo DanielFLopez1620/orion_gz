@@ -68,6 +68,7 @@ def generate_launch_description():
     rsp_file = os.path.join(pkg_orion_gz, 'launch', 'rsp_gz.launch.py')
     gz_file = os.path.join(pkg_gz, 'launch', 'gz_sim.launch.py')
     world_path = PathJoinSubstitution([pkg_orion_gz,'world', LaunchConfiguration('world')])
+    gui_config = os.path.join(pkg_orion_gz, 'config', 'orion_interaction_gui.config')
 
     # Include ORION Robot State Publisher
     ld.add_action(
@@ -86,12 +87,13 @@ def generate_launch_description():
         )
     )
 
-    # Include Gazebo Launch
+    # Include Gazebo Launch. The custom --gui-config wires the
+    # TouchSensorPlugin into the default gz sim GUI layout.
     ld.add_action(
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(gz_file),
             launch_arguments={
-                'gz_args': ['-r -v 4 ', world_path],
+                'gz_args': ['-r -v 4 --gui-config ', gui_config, ' ', world_path],
                 'on_exit_shutdown': 'true'
             }.items()
         )

@@ -35,8 +35,11 @@ TouchSensorPlugin::~TouchSensorPlugin() = default;
 
 void TouchSensorPlugin::LoadConfig(const tinyxml2::XMLElement *_pluginElem)
 {
-    // Start with defaults, then let SDF override
-    this->sensors = DEFAULT_SENSORS;
+    // Sensor list: SDF <sensor> entries fully replace the defaults so the
+    // same topic isn't advertised twice (once by a default and once by an
+    // override targeting a different visualName). The defaults are only
+    // applied when the SDF block has no <sensor> children at all.
+    this->sensors.clear();
 
     if (_pluginElem)
     {
@@ -48,7 +51,7 @@ void TouchSensorPlugin::LoadConfig(const tinyxml2::XMLElement *_pluginElem)
             this->debounceDuration = std::chrono::milliseconds(ms);
         }
 
-        // Optional sensor overrides / additions
+        // Sensor list from SDF
         for (auto *elem = _pluginElem->FirstChildElement("sensor");
              elem != nullptr;
              elem = elem->NextSiblingElement("sensor"))
@@ -57,22 +60,12 @@ void TouchSensorPlugin::LoadConfig(const tinyxml2::XMLElement *_pluginElem)
             const char *topic = elem->Attribute("topic");
             if (!name || !topic)
                 continue;
-
-            // Replace existing entry or append
-            bool replaced = false;
-            for (auto &s : this->sensors)
-            {
-                if (s.visualName == name)
-                {
-                    s.topic = topic;
-                    replaced = true;
-                    break;
-                }
-            }
-            if (!replaced)
-                this->sensors.push_back({name, topic});
+            this->sensors.push_back({name, topic});
         }
     }
+
+    if (this->sensors.empty())
+        this->sensors = DEFAULT_SENSORS;
 
     // Advertise publishers
     for (const auto &s : this->sensors)

@@ -109,6 +109,7 @@ def generate_launch_description():
     a010_bridge_path = os.path.join(pkg_gz, 'config', 'a010_bridge.yaml')
     g_mov_bridge_path = os.path.join(pkg_gz, 'config', 'g_mov_bridge.yaml')
     os30a_bridge_path = os.path.join(pkg_gz, 'config', 'os30a_bridge.yaml')
+    interaction_bridge_path = os.path.join(pkg_gz, 'config', 'interaction_bridge.yaml')
 
     # Additional config set up
     base_bridge_config = replace_entities(base_bridge_path)
@@ -117,6 +118,7 @@ def generate_launch_description():
     a010_bridge_config = replace_entities(a010_bridge_path)
     g_mov_bridge_config = replace_entities(g_mov_bridge_path)
     os30a_bridge_config = replace_entities(os30a_bridge_path)
+    interaction_bridge_config = replace_entities(interaction_bridge_path)
 
     # Include spawn orion robot
     ld.add_action(
@@ -227,6 +229,20 @@ def generate_launch_description():
                 output='screen',
                 condition=IfCondition(PythonExpression(
                     ["'", LaunchConfiguration('camera'), "' == 'os30a'"])),
+           ),
+    )
+
+    # Interaction bridge (touch sensors GZ→ROS, emotion ROS→GZ).
+    ld.add_action(
+       Node(
+               package='ros_gz_bridge',
+               name="ros_gz_bridge_interaction",
+               executable='parameter_bridge',
+               parameters=[{
+                'config_file': interaction_bridge_config
+                }],
+                output='screen',
+                condition=IfCondition(LaunchConfiguration('ros_bridge')),
            ),
     )
 

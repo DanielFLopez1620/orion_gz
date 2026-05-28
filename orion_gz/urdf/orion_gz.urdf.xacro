@@ -39,6 +39,7 @@
     <xacro:if value="${gazebo}">
         <xacro:include filename="$(find orion_gz)/urdf/include/orion_gz_sensors.urdf.xacro"/>
         <xacro:include filename="$(find orion_gz)/urdf/include/orion_gz_actuators.urdf.xacro"/>
+        <xacro:include filename="$(find orion_gz)/urdf/include/orion_gz_interaction.urdf.xacro"/>
     </xacro:if>
 
 </robot>

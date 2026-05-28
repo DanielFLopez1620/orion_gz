@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!-- @file orion_gz_interaction.urdf.xacro
+     @brief Gazebo-side geometry for the ORION interaction surfaces.
+
+     Adds the `emotion_face` link: a rectangular prism attached to screen_sup
+     that carries the emotion bitmap texture rendered by EmotionDisplayPlugin.
+
+     The interaction plugins themselves (EmotionColorPlugin, EmotionDisplayPlugin
+     and TouchSensorPlugin) are GUI plugins and CANNOT be loaded from URDF
+     `<gazebo><plugin>` tags — gz-sim only loads gz::sim::System plugins there,
+     and a server-side system plugin cannot drive the GUI's rendering scene.
+     They are loaded instead from orion_gz/config/orion_interaction_gui.config
+     via the gz sim gui-config flag (wired in spawn_robot.launch.py). That
+     config points EmotionColorPlugin at the existing `screen` STL visual and
+     EmotionDisplayPlugin at `emotion_face_visual` defined below.
+
+     This file is included from orion_gz.urdf.xacro when `gazebo=true` and is
+     specific to this repository — it does not touch orion_description URDFs. -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- ////////////////////// EMOTION FACE LINK //////////////////////////// -->
+    <!-- Rectangular prism attached to screen_sup. The visual is named
+         `emotion_face_visual` so the EmotionDisplayPlugin suffix match
+         ("::emotion_face_visual") locates it unambiguously. -->
+    <link name="emotion_face">
+        <!-- rpy "0 pi/4 0" keeps the same outward facing as the screen STL
+             (face normal points 45° up-and-forward) but spins the box 90° about
+             its own normal so the emotion bitmap renders upright instead of
+             sideways. If it comes out upside-down, use "0 ${-pi/4} ${pi}". -->
+        <visual name="emotion_face_visual">
+            <origin xyz="0 0 0" rpy="${pi} ${pi/4} 0"/>
+            <geometry>
+                <box size="0.0275 0.0425 0.0025"/>
+            </geometry>
+            <material name="EmotionFaceWhite">
+                <color rgba="1 1 1 1"/>
+            </material>
+        </visual>
+        <inertial>
+            <origin xyz="0 0 0" rpy=" ${pi} ${pi/4} 0"/>
+            <mass value="0.001"/>
+            <inertia ixx="1.0e-7" ixy="0.0" ixz="0.0"
+                     iyy="1.0e-7" iyz="0.0"
+                     izz="1.0e-7"/>
+        </inertial>
+    </link>
+
+    <joint name="emotion_face_joint" type="fixed">
+        <parent link="screen_sup"/>
+        <child link="emotion_face"/>
+        <!-- Pose mirrors the existing screen STL offset relative to screen_sup
+             (see orion_description/orion_base.urdf.xacro:593, where the screen
+             joint sits at 0.0275 0 0.0525) and pushes the prism 5 mm further
+             out so it is visible in front of the STL panel. -->
+        <origin xyz="0.0305 0 0.0555" rpy="0 0 0"/>
+    </joint>
+
+    <!-- The collision is intentionally omitted: this link is purely a visual
+         carrier for the emotion bitmap. -->
+
+</robot>

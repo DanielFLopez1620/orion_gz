@@ -98,14 +98,16 @@ void EmotionDisplayPlugin::OnRender()
     // contain visualName as a substring (e.g. "screen_color_visual" ⊃ "screen_visual").
     if (!this->screenVisual)
     {
-        const std::string suffix = "::" + this->visualName;
+        // Substring match on the scoped visual name. URDF→SDF lumping renames
+        // visuals to e.g. "base_link_fixed_joint_lump__emotion_face_visual_visual",
+        // so a suffix match against the authored name fails. Pick a substring
+        // that is stable and unique across the scene.
         for (unsigned int i = 0; i < this->scene->VisualCount(); ++i)
         {
             auto vis = this->scene->VisualByIndex(i);
             if (!vis) continue;
             const auto &n = vis->Name();
-            if (n.size() >= suffix.size() &&
-                n.compare(n.size() - suffix.size(), suffix.size(), suffix) == 0)
+            if (n.find(this->visualName) != std::string::npos)
             {
                 this->screenVisual = vis;
                 gzmsg << "[EmotionDisplayPlugin] Screen visual found: '"
