@@ -78,14 +78,14 @@
                             <stddev>0.01</stddev>
                         </noise>
                         <!-- Distorsion addition -->
-                        <distortion>
+                        <!--distortion>
                             <k1>0.02</k1>
                             <k2>0.02</k2>
                             <k3>0.01</k3>
                             <p1>0.01</p1>
                             <p2>0.01</p2>
                             <center>0.5 0.5</center>
-                        </distortion>
+                        </distortion-->
                     </xacro:if>
                     <gz_frame_id>camera_link</gz_frame_id>
                     <optical_frame_id>camera_link_optical</optical_frame_id>
@@ -115,14 +115,14 @@
                             <stddev>0.01</stddev>
                         </noise>
                         <!-- Distorsion addition -->
-                        <distortion>
+                        <!--distortion>
                             <k1>0.02</k1>
                             <k2>0.02</k2>
                             <k3>0.01</k3>
                             <p1>0.01</p1>
                             <p2>0.01</p2>
                             <center>0.5 0.5</center>
-                        </distortion>
+                        </distortion-->
                     </xacro:if>
                     <optical_frame_id>camera_link</optical_frame_id>
                 </camera>
@@ -157,14 +157,14 @@
                             <stddev>0.015</stddev>
                         </noise>
                         <!-- Distorsion addition -->
-                        <distortion>
+                        <!--distortion>
                             <k1>-0.1</k1>
                             <k2>0.02</k2>
                             <k3>0.01</k3>
                             <p1>0.0</p1>
                             <p2>0.0</p2>
                             <center>0.5 0.5</center>
-                        </distortion>
+                        </distortion-->
                     </xacro:if>
                     <gz_frame_id>camera_link</gz_frame_id>
                     <optical_frame_id>camera_link_optical</optical_frame_id>
@@ -195,14 +195,14 @@
                             <stddev>0.015</stddev>
                         </noise>
                         <!-- Distorsion addition -->
-                        <distortion>
+                        <!--distortion>
                             <k1>-0.1</k1>
                             <k2>0.02</k2>
                             <k3>0.01</k3>
                             <p1>0.0</p1>
                             <p2>0.0</p2>
                             <center>0.5 0.5</center>
-                        </distortion>
+                        </distortion-->
                     </xacro:if>
                     <optical_frame_id>camera_link</optical_frame_id>
                 </camera>
@@ -237,14 +237,14 @@
                             <stddev>0.01</stddev>
                         </noise>
                         <!-- Distorsion addition -->
-                        <distortion>
+                        <!--distortion>
                             <k1>-0.025</k1>
                             <k2>0.005</k2>
                             <k3>0.002</k3>
                             <p1>0.0</p1>
                             <p2>0.0</p2>
                             <center>0.5 0.5</center>
-                        </distortion>
+                        </distortion-->
                     </xacro:if>
                     <gz_frame_id>camera_link</gz_frame_id>
                     <optical_frame_id>camera_link_optical</optical_frame_id>
@@ -275,14 +275,14 @@
                             <stddev>0.01</stddev>
                         </noise>
                         <!-- Distorsion addition -->
-                        <distortion>
+                        <!--distortion>
                             <k1>-0.025</k1>
                             <k2>0.005</k2>
                             <k3>0.002</k3>
                             <p1>0.0</p1>
                             <p2>0.0</p2>
                             <center>0.5 0.5</center>
-                        </distortion>
+                        </distortion-->
                     </xacro:if>
                     <optical_frame_id>camera_link</optical_frame_id>
                 </camera>
