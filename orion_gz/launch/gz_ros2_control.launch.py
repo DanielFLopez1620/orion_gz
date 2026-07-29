@@ -32,7 +32,7 @@ ARGS = [
         choices=['rpi4', 'rpi5']),
     DeclareLaunchArgument('world', default_value='custom_empty.sdf',
         description='Specify the world file for Gazebo',
-        choices=['custom_empty.sdf', 'simple_obstacles.sdf', 'more_obstacles.sdf']),
+        choices=['custom_empty.sdf', 'simple_obstacles.sdf', 'more_obstacles.sdf', 'mapping_maze.sdf', 'turtle_world.sdf']),
     DeclareLaunchArgument('x', default_value='0.0', 
         description='Initial X position'),
     DeclareLaunchArgument('y', default_value='0.0',
@@ -170,9 +170,9 @@ def generate_launch_description():
                 "x": LaunchConfiguration('x'),
                 "y": LaunchConfiguration('y'),
                 "z": LaunchConfiguration('z'),
-                "roll": LaunchConfiguration('R'),
-                "pitch": LaunchConfiguration('P'),
-                "yaw": LaunchConfiguration('Y'),
+                "R": LaunchConfiguration('R'),
+                "P": LaunchConfiguration('P'),
+                "Y": LaunchConfiguration('Y'),
                 "world": LaunchConfiguration('world'),
                 "entity": LaunchConfiguration('entity'),
                 "ros_bridge": "true",
@@ -235,8 +235,8 @@ def generate_launch_description():
                 }],
                 output='screen',
                 condition=IfCondition(PythonExpression(
-                    ["'", LaunchConfiguration('camera'), "' == 'astra_s' and ",
-                    LaunchConfiguration('g_mov')])),
+                    ["'", LaunchConfiguration('camera'), "' == 'a010' and '",
+                    LaunchConfiguration('g_mov'), "' == 'true'"])),
            ),
     )
 

@@ -1,21 +1,22 @@
 <?xml version="1.0" ?>
 
 <!--
-  turtle_world.sdf
-  Self-contained recreation of the classic TurtleBot3 arena.
-  The original relied on Gazebo Fuel URLs and a model:// URI that failed
-  without internet or the turtlebot3_gazebo package installed.
+  mapping_maze.sdf
+  A maze-style world designed for 2D-LIDAR SLAM mapping with the ORION robot
+  (box footprint ~0.33 x 0.23 x 0.38 m).
 
-  Design: 6 x 6 m outer boundary, inner 2.4 x 2.4 m square structure with
-  one 1 m opening on each side, and four cylindrical pillars in the corners.
-  All geometry is inline — no external dependencies.
-
-  Compatible with ORION (0.33 x 0.23 x 0.38 m). All corridors >= 1 m wide.
+  Layout (top view, 10 x 10 m, origin at center):
+  - Outer perimeter walls
+  - 4 x 4 m central island with a 1 m gap on the east side
+  - Four internal dividers that force 1 m-wide corridor crossings
+  - Two dead-end alcoves (NW and SE) for mapping richness
+  - All corridors >= 1.0 m wide; wall height 0.8 m (visible to 2D LIDAR)
+  - One closed loop around the island ensures loop-closure opportunities
 -->
 
 <sdf version="1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="http://sdformat.org/schemas/root.xsd">
-    <world name="turtle_world">
+    <world name="mapping_maze">
 
         <!-- /////////////////// GLOBAL CONFIGURATIONS ///////////////////// -->
         <physics name="fast" type="ignored">
@@ -41,7 +42,8 @@
                 <scene>scene</scene>
                 <ambient_light>0.4 0.4 0.4</ambient_light>
                 <background_color>0.8 0.8 0.8</background_color>
-                <camera_pose>0 -9 7 0 0.7 1.57</camera_pose>
+                <!-- Angled top-down view to see the full maze -->
+                <camera_pose>0 -14 10 0 0.8 1.57</camera_pose>
             </plugin>
 
             <plugin filename="EntityContextMenuPlugin" name="Entity context menu">
@@ -184,7 +186,7 @@
                     <property type="double" key="height">315</property>
                     <property type="double" key="x">1070</property>
                 </gz-gui>
-                <topic>/world/turtle_world/model/orion/link/base_link/sensor/camera/depth_image</topic>
+                <topic>/world/mapping_maze/model/orion/link/base_link/sensor/camera/depth_image</topic>
                 <topic_picker>true</topic_picker>
             </plugin>
 
@@ -197,7 +199,7 @@
                     <property type="double" key="y">320</property>
                     <property type="double" key="x">1070</property>
                 </gz-gui>
-                <topic>/world/turtle_world/model/orion/link/base_link/sensor/camera/image</topic>
+                <topic>/world/mapping_maze/model/orion/link/base_link/sensor/camera/image</topic>
                 <topic_picker>true</topic_picker>
             </plugin>
 
@@ -267,227 +269,236 @@
 
         <!--
           ================================================================
-          TURTLE WORLD ARENA — inspired by the classic TurtleBot3 world.
+          MAZE WALLS — all static boxes, height 0.8 m, thickness 0.2 m.
 
-          Layout (top view, 6 x 6 m outer boundary):
+          Layout diagram (top view, each square ~ 1 m):
 
-              -3    -2    -1     0     1     2     3
-          3   [======================wall=============]
-          2   [|  pillar  |  inner north wall  |  p  ]
-          1   [|          gap  |          |  gap     ]
-          0   [|  inner W |       inner   | inner E  ]
-         -1   [|          gap  |          |  gap     ]
-         -2   [|  pillar  |  inner south wall  |  p  ]
-         -3   [======================wall=============]
+              -5   -4   -3   -2   -1    0    1    2    3    4    5
+          5  [====================================================]
+          4  [|  NW dead-end  |  gap  |       NE open       |    ]
+          3  [| alcove_nw |gap|       | div_north continues |    ]
+          2  [|           |   |island_north (y=2)           |    ]
+          1  [| west      | gap| island (center)  |gap|east |    ]
+          0  [| div_west..|gap|  island_west       |gap|..div_east]
+         -1  [|           |   | island (center)  |gap|     |    ]
+         -2  [|           |   |island_south (y=-2)          |    ]
+         -3  [|           |   |       | div_south continues |    ]
+         -4  [|           |   |       | gap   | SE dead-end |    ]
+         -5  [====================================================]
 
-          Inner square: 2.4 x 2.4 m (x: ±1.2, y: ±1.2)
-          Each side has a 1.0 m opening (centred at 0) → two 0.7 m wall pieces.
-          Pillars (r=0.15 m) at (±2, ±2).
-          All open corridors: min 1.8 m wide — ORION (0.33 m) fits easily.
+          Corridor widths (robot is 0.33 m wide):
+            Outer ring strips  : 3.0 m  (between outer wall and island)
+            N/S divider gaps   : 1.0 m  (at x=0, between island wall and divider)
+            E/W divider gaps   : 1.0 m  (at y=0, between island wall and divider)
+            Island east entry  : 1.0 m  (y = -0.5 to +0.5)
           ================================================================
         -->
 
-        <!-- ===== OUTER PERIMETER WALLS (6 x 6 m) ===== -->
+        <!-- ===== OUTER PERIMETER WALLS ===== -->
         <model name="outer_south">
             <static>true</static>
-            <pose>0 -3 0.4 0 0 0</pose>
+            <pose>0 -5 0.4 0 0 0</pose>
             <link name="link">
-                <collision name="collision"><geometry><box><size>6.4 0.2 0.8</size></box></geometry></collision>
+                <collision name="collision"><geometry><box><size>10.4 0.2 0.8</size></box></geometry></collision>
                 <visual name="visual">
-                    <geometry><box><size>6.4 0.2 0.8</size></box></geometry>
-                    <material><ambient>0.55 0.55 0.55 1</ambient><diffuse>0.55 0.55 0.55 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                    <geometry><box><size>10.4 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
                 </visual>
             </link>
         </model>
 
         <model name="outer_north">
             <static>true</static>
-            <pose>0 3 0.4 0 0 0</pose>
+            <pose>0 5 0.4 0 0 0</pose>
             <link name="link">
-                <collision name="collision"><geometry><box><size>6.4 0.2 0.8</size></box></geometry></collision>
+                <collision name="collision"><geometry><box><size>10.4 0.2 0.8</size></box></geometry></collision>
                 <visual name="visual">
-                    <geometry><box><size>6.4 0.2 0.8</size></box></geometry>
-                    <material><ambient>0.55 0.55 0.55 1</ambient><diffuse>0.55 0.55 0.55 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                    <geometry><box><size>10.4 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
                 </visual>
             </link>
         </model>
 
         <model name="outer_west">
             <static>true</static>
-            <pose>-3 0 0.4 0 0 0</pose>
+            <pose>-5 0 0.4 0 0 0</pose>
             <link name="link">
-                <collision name="collision"><geometry><box><size>0.2 6.4 0.8</size></box></geometry></collision>
+                <collision name="collision"><geometry><box><size>0.2 10.4 0.8</size></box></geometry></collision>
                 <visual name="visual">
-                    <geometry><box><size>0.2 6.4 0.8</size></box></geometry>
-                    <material><ambient>0.55 0.55 0.55 1</ambient><diffuse>0.55 0.55 0.55 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                    <geometry><box><size>0.2 10.4 0.8</size></box></geometry>
+                    <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
                 </visual>
             </link>
         </model>
 
         <model name="outer_east">
             <static>true</static>
-            <pose>3 0 0.4 0 0 0</pose>
+            <pose>5 0 0.4 0 0 0</pose>
             <link name="link">
-                <collision name="collision"><geometry><box><size>0.2 6.4 0.8</size></box></geometry></collision>
+                <collision name="collision"><geometry><box><size>0.2 10.4 0.8</size></box></geometry></collision>
                 <visual name="visual">
-                    <geometry><box><size>0.2 6.4 0.8</size></box></geometry>
-                    <material><ambient>0.55 0.55 0.55 1</ambient><diffuse>0.55 0.55 0.55 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                    <geometry><box><size>0.2 10.4 0.8</size></box></geometry>
+                    <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.6 0.6 0.6 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- ===== CENTRAL ISLAND WALLS (4 x 4 m box, open east side) ===== -->
+        <!-- North wall of island: x = -2 to +2 at y = 2 -->
+        <model name="island_north">
+            <static>true</static>
+            <pose>0 2 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>4.2 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>4.2 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.3 0.5 0.8 1</ambient><diffuse>0.3 0.5 0.8 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- South wall of island: x = -2 to +2 at y = -2 -->
+        <model name="island_south">
+            <static>true</static>
+            <pose>0 -2 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>4.2 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>4.2 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.3 0.5 0.8 1</ambient><diffuse>0.3 0.5 0.8 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- West wall of island: y = -2 to +2 at x = -2 -->
+        <model name="island_west">
+            <static>true</static>
+            <pose>-2 0 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 4.0 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 4.0 0.8</size></box></geometry>
+                    <material><ambient>0.3 0.5 0.8 1</ambient><diffuse>0.3 0.5 0.8 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- East wall of island — north half: y = +0.5 to +2.0 at x = 2 -->
+        <!-- Gap: y = -0.5 to +0.5 (1.0 m opening, ORION 0.33 m wide fits easily) -->
+        <model name="island_east_north">
+            <static>true</static>
+            <pose>2 1.25 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 1.5 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 1.5 0.8</size></box></geometry>
+                    <material><ambient>0.3 0.5 0.8 1</ambient><diffuse>0.3 0.5 0.8 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- East wall of island — south half: y = -2.0 to -0.5 at x = 2 -->
+        <model name="island_east_south">
+            <static>true</static>
+            <pose>2 -1.25 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 1.5 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 1.5 0.8</size></box></geometry>
+                    <material><ambient>0.3 0.5 0.8 1</ambient><diffuse>0.3 0.5 0.8 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- ===== CORRIDOR DIVIDERS (force 1 m narrow crossings) ===== -->
+        <!--
+          Each divider splits one side of the outer ring and leaves a 1 m gap
+          that the robot must pass through.  This creates "checkpoints" that
+          are rich in LIDAR features and force careful navigation.
+        -->
+
+        <!-- North divider: x = 0, y = 3 → 5  (gap: y = 2 to 3) -->
+        <model name="div_north">
+            <static>true</static>
+            <pose>0 4 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 2.0 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 2.0 0.8</size></box></geometry>
+                    <material><ambient>0.8 0.5 0.2 1</ambient><diffuse>0.8 0.5 0.2 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- South divider: x = 0, y = -5 → -3  (gap: y = -3 to -2) -->
+        <model name="div_south">
+            <static>true</static>
+            <pose>0 -4 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>0.2 2.0 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 2.0 0.8</size></box></geometry>
+                    <material><ambient>0.8 0.5 0.2 1</ambient><diffuse>0.8 0.5 0.2 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- West divider: y = 0, x = -5 → -3  (gap: x = -3 to -2) -->
+        <model name="div_west">
+            <static>true</static>
+            <pose>-4 0 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>2.0 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>2.0 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.8 0.5 0.2 1</ambient><diffuse>0.8 0.5 0.2 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- East divider: y = 0, x = 3 → 5  (gap: x = 2 to 3) -->
+        <model name="div_east">
+            <static>true</static>
+            <pose>4 0 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>2.0 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>2.0 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.8 0.5 0.2 1</ambient><diffuse>0.8 0.5 0.2 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- ===== DEAD-END ALCOVES (mapping challenge, no exit) ===== -->
+        <!--
+          NW alcove wall: y = 3.5, x = -5 → -2
+          Creates a blind pocket in the north-west quadrant.
+          The robot enters from the right side (x > -2) at y = 3.5 → 5.
+        -->
+        <model name="alcove_nw">
+            <static>true</static>
+            <pose>-3.5 3.5 0.4 0 0 0</pose>
+            <link name="link">
+                <collision name="collision"><geometry><box><size>3.0 0.2 0.8</size></box></geometry></collision>
+                <visual name="visual">
+                    <geometry><box><size>3.0 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.7 0.2 0.2 1</ambient><diffuse>0.7 0.2 0.2 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
                 </visual>
             </link>
         </model>
 
         <!--
-          ===== INNER SQUARE WALLS (2.4 x 2.4 m centred at origin) =====
-          Each side is split in two, leaving a 1.0 m central gap.
-          Wall piece length = (2.4 - 1.0) / 2 = 0.7 m
-          Centre of each piece: ±(0.5 + 0.35) = ±0.85 from origin along the side axis.
+          SE alcove wall: y = -3.5, x = 2 → 5
+          Creates a blind pocket in the south-east quadrant.
         -->
-
-        <!-- South side of inner square (y = -1.2) -->
-        <model name="inner_south_w">
+        <model name="alcove_se">
             <static>true</static>
-            <pose>-0.85 -1.2 0.4 0 0 0</pose>
+            <pose>3.5 -3.5 0.4 0 0 0</pose>
             <link name="link">
-                <collision name="collision"><geometry><box><size>0.7 0.2 0.8</size></box></geometry></collision>
+                <collision name="collision"><geometry><box><size>3.0 0.2 0.8</size></box></geometry></collision>
                 <visual name="visual">
-                    <geometry><box><size>0.7 0.2 0.8</size></box></geometry>
-                    <material><ambient>0.25 0.45 0.75 1</ambient><diffuse>0.25 0.45 0.75 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
-                </visual>
-            </link>
-        </model>
-
-        <model name="inner_south_e">
-            <static>true</static>
-            <pose>0.85 -1.2 0.4 0 0 0</pose>
-            <link name="link">
-                <collision name="collision"><geometry><box><size>0.7 0.2 0.8</size></box></geometry></collision>
-                <visual name="visual">
-                    <geometry><box><size>0.7 0.2 0.8</size></box></geometry>
-                    <material><ambient>0.25 0.45 0.75 1</ambient><diffuse>0.25 0.45 0.75 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
-                </visual>
-            </link>
-        </model>
-
-        <!-- North side of inner square (y = +1.2) -->
-        <model name="inner_north_w">
-            <static>true</static>
-            <pose>-0.85 1.2 0.4 0 0 0</pose>
-            <link name="link">
-                <collision name="collision"><geometry><box><size>0.7 0.2 0.8</size></box></geometry></collision>
-                <visual name="visual">
-                    <geometry><box><size>0.7 0.2 0.8</size></box></geometry>
-                    <material><ambient>0.25 0.45 0.75 1</ambient><diffuse>0.25 0.45 0.75 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
-                </visual>
-            </link>
-        </model>
-
-        <model name="inner_north_e">
-            <static>true</static>
-            <pose>0.85 1.2 0.4 0 0 0</pose>
-            <link name="link">
-                <collision name="collision"><geometry><box><size>0.7 0.2 0.8</size></box></geometry></collision>
-                <visual name="visual">
-                    <geometry><box><size>0.7 0.2 0.8</size></box></geometry>
-                    <material><ambient>0.25 0.45 0.75 1</ambient><diffuse>0.25 0.45 0.75 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
-                </visual>
-            </link>
-        </model>
-
-        <!-- West side of inner square (x = -1.2) -->
-        <model name="inner_west_s">
-            <static>true</static>
-            <pose>-1.2 -0.85 0.4 0 0 0</pose>
-            <link name="link">
-                <collision name="collision"><geometry><box><size>0.2 0.7 0.8</size></box></geometry></collision>
-                <visual name="visual">
-                    <geometry><box><size>0.2 0.7 0.8</size></box></geometry>
-                    <material><ambient>0.25 0.45 0.75 1</ambient><diffuse>0.25 0.45 0.75 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
-                </visual>
-            </link>
-        </model>
-
-        <model name="inner_west_n">
-            <static>true</static>
-            <pose>-1.2 0.85 0.4 0 0 0</pose>
-            <link name="link">
-                <collision name="collision"><geometry><box><size>0.2 0.7 0.8</size></box></geometry></collision>
-                <visual name="visual">
-                    <geometry><box><size>0.2 0.7 0.8</size></box></geometry>
-                    <material><ambient>0.25 0.45 0.75 1</ambient><diffuse>0.25 0.45 0.75 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
-                </visual>
-            </link>
-        </model>
-
-        <!-- East side of inner square (x = +1.2) -->
-        <model name="inner_east_s">
-            <static>true</static>
-            <pose>1.2 -0.85 0.4 0 0 0</pose>
-            <link name="link">
-                <collision name="collision"><geometry><box><size>0.2 0.7 0.8</size></box></geometry></collision>
-                <visual name="visual">
-                    <geometry><box><size>0.2 0.7 0.8</size></box></geometry>
-                    <material><ambient>0.25 0.45 0.75 1</ambient><diffuse>0.25 0.45 0.75 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
-                </visual>
-            </link>
-        </model>
-
-        <model name="inner_east_n">
-            <static>true</static>
-            <pose>1.2 0.85 0.4 0 0 0</pose>
-            <link name="link">
-                <collision name="collision"><geometry><box><size>0.2 0.7 0.8</size></box></geometry></collision>
-                <visual name="visual">
-                    <geometry><box><size>0.2 0.7 0.8</size></box></geometry>
-                    <material><ambient>0.25 0.45 0.75 1</ambient><diffuse>0.25 0.45 0.75 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
-                </visual>
-            </link>
-        </model>
-
-        <!-- ===== CORNER PILLARS (radius 0.15 m, height 0.8 m) ===== -->
-        <model name="pillar_ne">
-            <static>true</static>
-            <pose>2 2 0.4 0 0 0</pose>
-            <link name="link">
-                <collision name="collision"><geometry><cylinder><radius>0.15</radius><length>0.8</length></cylinder></geometry></collision>
-                <visual name="visual">
-                    <geometry><cylinder><radius>0.15</radius><length>0.8</length></cylinder></geometry>
-                    <material><ambient>0.7 0.35 0.1 1</ambient><diffuse>0.7 0.35 0.1 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
-                </visual>
-            </link>
-        </model>
-
-        <model name="pillar_nw">
-            <static>true</static>
-            <pose>-2 2 0.4 0 0 0</pose>
-            <link name="link">
-                <collision name="collision"><geometry><cylinder><radius>0.15</radius><length>0.8</length></cylinder></geometry></collision>
-                <visual name="visual">
-                    <geometry><cylinder><radius>0.15</radius><length>0.8</length></cylinder></geometry>
-                    <material><ambient>0.7 0.35 0.1 1</ambient><diffuse>0.7 0.35 0.1 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
-                </visual>
-            </link>
-        </model>
-
-        <model name="pillar_se">
-            <static>true</static>
-            <pose>2 -2 0.4 0 0 0</pose>
-            <link name="link">
-                <collision name="collision"><geometry><cylinder><radius>0.15</radius><length>0.8</length></cylinder></geometry></collision>
-                <visual name="visual">
-                    <geometry><cylinder><radius>0.15</radius><length>0.8</length></cylinder></geometry>
-                    <material><ambient>0.7 0.35 0.1 1</ambient><diffuse>0.7 0.35 0.1 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
-                </visual>
-            </link>
-        </model>
-
-        <model name="pillar_sw">
-            <static>true</static>
-            <pose>-2 -2 0.4 0 0 0</pose>
-            <link name="link">
-                <collision name="collision"><geometry><cylinder><radius>0.15</radius><length>0.8</length></cylinder></geometry></collision>
-                <visual name="visual">
-                    <geometry><cylinder><radius>0.15</radius><length>0.8</length></cylinder></geometry>
-                    <material><ambient>0.7 0.35 0.1 1</ambient><diffuse>0.7 0.35 0.1 1</diffuse><specular>0.3 0.3 0.3 1</specular></material>
+                    <geometry><box><size>3.0 0.2 0.8</size></box></geometry>
+                    <material><ambient>0.7 0.2 0.2 1</ambient><diffuse>0.7 0.2 0.2 1</diffuse><specular>0.4 0.4 0.4 1</specular></material>
                 </visual>
             </link>
         </model>

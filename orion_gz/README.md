@@ -19,13 +19,14 @@ The orion_gz package has been tested under [ROS](https://www.ros.org/) Jazzy and
 - [🚀 Launch file](#-launch-files)
 - [⚙️ RViz2 Configs](#️-rviz2-configs)
 - [⚙️ Params and configs](#️-params-and-configs)
+- [🌍 Worlds](#-worlds)
 - [⚠️ Troubleshooting](#️-troubleshooting)
 
 ---
 
 ## 🚀 Launch files
 
-Make sure you have followed the [installation_process](/README.md) for the GZ package and the [ORION common](https://github.com/Tesis-ORION/orion_common) repository, also you should have sourced your workspace before you continue:
+Make sure you have followed the [installation_process](/README.md) for the GZ package and the [ORION common](https://github.com/DanielFLopez1620/orion_common) repository, also you should have sourced your workspace before you continue:
 
 ### Robot State Publisher for Gazebo
 
@@ -72,7 +73,7 @@ Spawn the robot in a given world of the simulator GZ Sim by considering the [spa
 ros2 launch orion_gz spawn_robot.launch.py camera:=astra_s 
 ~~~
 
-![spawn_robot](https://github.com/Tesis-ORION/orion_common/blob/main/docs/readmes/spawn_robot.gif)
+![spawn_robot](https://github.com/DanielFLopez1620/orion_common/blob/main/docs/readmes/spawn_robot.gif)
 
 ### Gazebo launch with ROS Bridge
 
@@ -97,7 +98,7 @@ Spawn the robot and includes the proper bridges to make possible the communicati
 ros2 launch orion_gz gz_ros.launch.py rasp:=rpi5 camera:=os30a
 ~~~
 
-![gz_ros_launch](https://github.com/Tesis-ORION/orion_common/blob/main/docs/readmes/gz_ros.gif)
+![gz_ros_launch](https://github.com/DanielFLopez1620/orion_common/blob/main/docs/readmes/gz_ros.gif)
 
 ### Gazebo launch with ros2_control
 
@@ -122,7 +123,7 @@ Spawn the robot and includes the configuration of bridges for sensors while also
 ros2 launch orion_gz gz_ros2_control.launch.py rasp:=rpi4 camera:=os30a
 ~~~
 
-![gz_ros2_control_launch](https://github.com/Tesis-ORION/orion_common/blob/main/docs/readmes/gz_ros2_control.gif)
+![gz_ros2_control_launch](https://github.com/DanielFLopez1620/orion_common/blob/main/docs/readmes/gz_ros2_control.gif)
 
 ---
 
@@ -182,6 +183,28 @@ Focused on the commands from ROS to GZ of the arms' servos when using native GZ 
 
 ---
 
+## 🌍 Worlds
+
+All worlds live in the [world](/orion_gz/world/) directory. The internal world
+name matches the file name (without the `.sdf` extension), which is required by
+the GZ bridge topic convention (see [Troubleshooting](#️-troubleshooting)).
+
+| World | Description |
+| --- | --- |
+| `custom_empty.sdf` | Empty ground plane with default lighting. Default world. |
+| `simple_obstacles.sdf` | A few primitive obstacles for basic navigation tests. |
+| `more_obstacles.sdf` | Denser obstacle layout for harder navigation scenarios. |
+| `mapping_maze.sdf` | Maze-like environment for SLAM / mapping experiments. |
+| `turtle_world.sdf` | TurtleBot3-inspired world for navigation and demos. |
+
+Select a world with the `world` argument, e.g.:
+
+~~~bash
+ros2 launch orion_gz gz_ros.launch.py world:=mapping_maze.sdf
+~~~
+
+---
+
 ## 🗒️ Additional comments
 
 - By default, the **rgdb** and **depth** cameras' **point clouds** were disabled due to high overload and slow the processing of the simulation. If you want to activate them, go to the [config](/orion_gz/config/) dir, search for the .yaml file of the camera you want to use and uncomment the point cloud arg.
@@ -212,7 +235,7 @@ This may depend on your machine resources, as ORION contains multiple plugins fo
 
 ### Problems adding new world
 
-Currently there are 3 supported world, if you want to explore with another one, it is recommended to clone it into the [worlds](/orion_gz/world/) directory, ensuring that the name of the file and the name of the world are the same excluding the extension, for example, if you want to add a world called *park.sdf*, then the name of the world should be *park*.
+Currently there are 5 supported worlds, if you want to explore with another one, it is recommended to clone it into the [worlds](/orion_gz/world/) directory, ensuring that the name of the file and the name of the world are the same excluding the extension, for example, if you want to add a world called *park.sdf*, then the name of the world should be *park*.
 
 If you do not respect this convention, the GZ topics convention name for ORION will fail. You can validate this by going to the different config files of the GZ bridge in the [config](/orion_gz/config/) directory.
 
