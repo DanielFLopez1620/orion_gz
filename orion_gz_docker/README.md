@@ -1,189 +1,110 @@
-# ORION GZ Docker
+# ORION GZ Docker Setup
 
-Containerized environment for working on the ORION Gazebo Harmonic simulation
-stack with ROS 2 Jazzy. The image is a thin layer on top of `orion_dev:latest`
-(from the [orion_common](https://github.com/DanielFLopez1620/orion_common)
-repository), which already bundles Gazebo Harmonic, RViz2, Nav2, SLAM Toolbox,
-`gz_ros2_control`, and the rest of the ORION development tooling.
+This directory contains Docker and DevContainer configurations for the Gazebo Harmonic simulation environment.
 
----
+## Image Hierarchy
 
-## Architecture
-
-```plaintext
-osrf/ros:jazzy-ros-base       (upstream)
-        │
-        ▼
-  orion_base:latest           (built from orion_common/orion_docker/base)
-        │
-        ▼
-  orion_dev:latest            (built from orion_common/orion_docker/dev)
-        │
-        ▼
-  orion_gz_dev (this image)   (FROM orion_dev:latest — minimal layer)
+```
+orion_base (from orion_common)
+    ↓
+orion_dev (from orion_common)
+    ↓
+orion_gz (GZ-specific layer - this repo)
+    ↓
+orion_gz:dev (devcontainer)
 ```
 
-The image does **not** duplicate any of the dependencies already installed in
-`orion_dev:latest`. It exists so a developer working primarily on simulation
-can open the `orion_gz` repository as the devcontainer workspace (instead of
-opening `orion_common` and treating `orion_gz` as a clone).
+### Image Descriptions
 
----
+| Image | Purpose | Base |
+|-------|---------|------|
+| **orion_base** | ROS 2 + micro-ROS + Orbbec SDK | `ros:jazzy-ros-base` |
+| **orion_dev** | Development tools (RViz, cameras, audio) | `orion_base:latest` |
+| **orion_gz** | Gazebo Harmonic + simulation tools | `orion_dev:latest` |
+| **orion_gz:dev** | DevContainer for simulation development | `orion_gz:latest` |
 
-## Prerequisites
+## Building Images
 
-- [Docker Engine](https://docs.docker.com/engine/install/ubuntu/)
-- [VS Code](https://code.visualstudio.com/) with the
-  [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-  and [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)
-  extensions
-- `orion_base:latest` and `orion_dev:latest` images already built from
-  [orion_common](https://github.com/DanielFLopez1620/orion_common). Follow the
-  instructions in
-  [orion_common/orion_docker/README.md](https://github.com/DanielFLopez1620/orion_common/blob/main/orion_docker/README.md)
-  for the first two layers.
-
-Quick reminder of the parent build steps:
+### Option 1: Build Everything from Scratch
 
 ```bash
-git clone https://github.com/DanielFLopez1620/orion_common.git
-cd orion_common
-docker build -t orion_base:latest orion_docker/base/
-docker build -t orion_dev:latest  orion_docker/dev/
+# From orion_common repo
+cd ~/dev_ws/src/orion_common
+docker build -f orion_docker/base/Dockerfile -t orion_base:latest .
+docker build -f orion_docker/dev/Dockerfile -t orion_dev:latest .
+
+# From orion_gz repo
+cd ~/dev_ws/src/orion_gz
+docker build -f orion_gz_docker/base/Dockerfile -t orion_gz:latest .
+docker build -f orion_gz_docker/dev/Dockerfile -t orion_gz:dev .
 ```
 
----
+### Option 2: Using Docker Compose (Recommended)
 
-## Host setup (run once)
-
-X11 display forwarding for RViz2 and Gazebo:
+If a `docker-compose.yml` is available at the workspace root, simply run:
 
 ```bash
-xhost +local:docker
-# To apply automatically on login:
-# echo "xhost +local:docker" >> ~/.profile
+docker compose build --no-cache
 ```
 
----
+## DevContainer Setup
 
-## Open in VS Code
+### Opening in VS Code
 
-The repository ships a `.devcontainer/` symlink at the root pointing to
-`orion_gz_docker/dev/`. To start the container:
+1. Open the orion_gz folder in VS Code
+2. Click **Remote Container** icon → **Reopen in Container**
+3. VS Code will automatically build the `orion_gz:dev` image
 
-1. Clone this repository:
+### Key Environment Variables
 
-   ```bash
-   git clone https://github.com/DanielFLopez1620/orion_gz.git
-   cd orion_gz
-   ```
+- `ROS_DOMAIN_ID=16` — Keeps simulation isolated from robot hardware (which uses domain 0)
+- `RMW_IMPLEMENTATION=rmw_cyclonedds_cpp` — Inherited from orion_dev
 
-2. Open the **repository root** (not a subdirectory) in VS Code:
+### Post-Create Setup
 
-   ```bash
-   code .
-   ```
+When the container starts:
+1. Creates workspace directories (`build/`, `install/`, `log/`)
+2. Imports external repositories (defined in `repos.yaml`)
+3. Installs ROS dependencies via `rosdep`
 
-3. Run the command palette action `Dev Containers: Reopen in Container`
-   (`Ctrl + Shift + P`).
-
-VS Code will build the local image (instant after the first build — it only
-adds a marker layer on top of `orion_dev:latest`) and run
-[`post_create.sh`](dev/post_create.sh), which:
-
-- Clones `orion_common` into `~/ws/src/` (see [`repos.yaml`](dev/repos.yaml))
-- Runs `rosdep install` for any remaining dependencies
-
----
-
-## Build the workspace
-
-Once the container is running and `post_create.sh` has finished:
+To build the workspace after container creation:
 
 ```bash
 cd ~/ws
-colcon build --symlink-install --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-source install/setup.bash
+colcon build --symlink-install
 ```
 
-The `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` flag generates `compile_commands.json`,
-enabling full C++ IntelliSense in VS Code.
+## What's Included
 
----
+### In `orion_gz` layer
 
-## Run the simulation
+- **Gazebo Harmonic**
+  - `ros-jazzy-ros-gz` — Gazebo + ROS 2 integration
+  - `ros-jazzy-ros-gz-sim` — Gazebo simulator
+  - `ros-jazzy-ros-gz-bridge` — Topic/service bridge
+  - `ros-jazzy-ros-gz-image` — Image transport support
 
-After building, the standard launch entry points work as usual:
+- **Simulation Control**
+  - `ros-jazzy-gz-ros2-control` — Gazebo + ros2_control integration
+  - `ros-jazzy-xacro` — URDF macro processor
+  - `ros-jazzy-urdfdom-py` — Python URDF utilities
 
-```bash
-# Robot State Publisher only
-ros2 launch orion_gz rsp_gz.launch.py camera:=os30a
+## Notes
 
-# Gazebo + bridges
-ros2 launch orion_gz gz_ros.launch.py camera:=os30a servo:=true
+- **orion_gz does NOT include**: Nav2, SLAM, trajectory planning (see orion_tools for those)
+- **orion_gz does NOT rebuild** dev tools from orion_dev (RViz, camera drivers, etc.) — inherited as-is
+- Each layer is independently cacheable during builds
 
-# Gazebo + ros2_control
-ros2 launch orion_gz gz_ros2_control.launch.py camera:=os30a servo:=true
+## Repository Configuration
+
+The `repos.yaml` in the devcontainer defines which packages are imported:
+
+```yaml
+repositories:
+  orion_gz:  # Not listed — bind-mounted by devcontainer
+  orion_common:  # Imported from GitHub
+    url: https://github.com/DanielFLopez1620/orion_common.git
+    version: main
 ```
 
-See [orion_gz/README.md](../orion_gz/README.md) for the full launch surface.
-
----
-
-## Directory layout
-
-```plaintext
-orion_gz_docker/
-└── dev/
-    ├── Dockerfile          ← thin layer on top of orion_dev:latest
-    ├── devcontainer.json   ← VS Code devcontainer config
-    ├── repos.yaml          ← external repos cloned by post_create.sh
-    └── post_create.sh      ← workspace setup script
-```
-
-The `.devcontainer/` directory at the repository root is a symlink to
-`orion_gz_docker/dev/`.
-
----
-
-## ROS_DOMAIN_ID
-
-The container sets `ROS_DOMAIN_ID=16` to keep simulation traffic isolated from
-a real-robot stack (which uses `ROS_DOMAIN_ID=0` for the micro-ROS agent) if
-both are running on the same host. Override it in
-[`devcontainer.json`](dev/devcontainer.json) under `containerEnv` if you need a
-different value.
-
----
-
-## GPU support
-
-`--gpus all` is left commented out in [`devcontainer.json`](dev/devcontainer.json).
-To enable it, install the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
-on the host and uncomment the flag.
-
----
-
-## Troubleshooting
-
-### `Authorization required` when launching RViz2 or Gazebo
-
-Run `xhost +local:docker` on the host.
-
-### `fatal: detected dubious ownership` in git
-
-The container changed file ownership on the bind-mounted directory. Fix with:
-
-```bash
-sudo chown -R $USER:$USER /path/to/orion_gz
-```
-
-### `orion_dev:latest: pull access denied` during build
-
-The parent image is **not** on Docker Hub — it has to be built locally from
-`orion_common`. See [Prerequisites](#prerequisites).
-
-### Slow simulation
-
-See the troubleshooting section in
-[orion_gz/README.md](../orion_gz/README.md#-troubleshooting).
+This ensures the simulation environment has access to common utilities while keeping orion_gz isolated for development.
