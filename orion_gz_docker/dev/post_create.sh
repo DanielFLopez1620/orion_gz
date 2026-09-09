@@ -23,8 +23,16 @@ vcs import src < "${REPOS_YAML}"
 echo "Running rosdep..."
 rosdep update
 sudo apt-get update
+# The depth_* and ldlidar_component keys are source packages required by
+# orion_bringup (real robot only). They are not cloned into this simulation
+# workspace, so rosdep cannot resolve them — skip them and exclude
+# orion_bringup from the build below.
 rosdep install --from-paths src --ignore-src -y \
-    --skip-keys="sounddevice webrtcvad python3-sounddevice pytest"
+    --skip-keys="sounddevice webrtcvad python3-sounddevice pytest depth_maixsense_a010 depth_ydlidar_os30a ldlidar_component"
 
 echo "Done. Build the workspace with:"
-echo "  cd ${WS_ROOT} && colcon build --symlink-install"
+echo "  cd ${WS_ROOT} && colcon build --symlink-install --packages-ignore orion_bringup orion"
+echo ""
+echo "NOTE: orion_bringup (real robot) and orion (metapackage depending on it)"
+echo "      must be ignored — they need the physical sensor drivers, which are"
+echo "      not part of this simulation workspace."

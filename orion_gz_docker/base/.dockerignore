@@ -1,0 +1,45 @@
+# Build artifacts
+build/
+install/
+log/
+
+# Colcon metadata
+.colcon/
+
+# PlatformIO cache
+.pio/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+# Git & CI/CD
+.git/
+.github/
+.gitignore
+.gitattributes
+.gitmodules
+
+# Documentation
+docs/
+*.md
+*.rst
+
+# IDEs & editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment secrets
+.env
+.env.*
+
+# Others
+.DS_Store
+*.tmp
+*.temp

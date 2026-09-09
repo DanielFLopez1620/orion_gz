@@ -5,3 +5,9 @@ repositories:
     type: git
     url: https://github.com/DanielFLopez1620/orion_common.git
     version: main
+
+  # Physical sensor drivers (ldrobot_lidar_ros2, depth_maixsense_a010,
+  # depth_ydlidar_os30a) are intentionally NOT cloned here. They are only needed
+  # by orion_bringup, which drives the real robot — the simulation launches from
+  # orion_gz instead. post_create.sh skips their rosdep keys, and orion_bringup
+  # must be excluded from the build (see README).
